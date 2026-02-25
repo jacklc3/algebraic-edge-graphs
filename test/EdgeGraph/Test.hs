@@ -1,12 +1,11 @@
 {-# LANGUAGE RankNTypes #-}
-module Algebra.Graph.Test (
+module EdgeGraph.Test (
     module Data.List,
     module Data.List.Extra,
     module Test.QuickCheck,
     module Test.QuickCheck.Function,
 
-    GraphTestsuite, axioms, theorems, undirectedAxioms, reflexiveAxioms,
-    transitiveAxioms, preorderAxioms, test,
+    GraphTestsuite, axioms, theorems, test,
     ) where
 
 import Data.List (sort)
@@ -15,10 +14,9 @@ import Prelude hiding ((+), (*), (<=))
 import System.Exit (exitFailure)
 import Test.QuickCheck hiding ((===))
 import Test.QuickCheck.Function
-import Test.QuickCheck.Test (isSuccess)
 
-import Algebra.Graph.Class
-import Algebra.Graph.Test.Arbitrary ()
+import EdgeGraph.Class
+import EdgeGraph.Test.Arbitrary ()
 
 test :: Testable a => String -> a -> IO ()
 test str p = do
@@ -30,13 +28,13 @@ test str p = do
             putStrLn $ output result
             exitFailure
 
-(+) :: Graph g => g -> g -> g
+(+) :: EdgeGraph g => g -> g -> g
 (+) = overlay
 
-(*) :: Graph g => g -> g -> g
-(*) = connect
+(*) :: EdgeGraph g => g -> g -> g
+(*) = into
 
-(<=) :: (Eq g, Graph g) => g -> g -> Bool
+(<=) :: (Eq g, EdgeGraph g) => g -> g -> Bool
 (<=) = isSubgraphOf
 
 (//) :: Testable prop => prop -> String -> Property
@@ -47,15 +45,15 @@ infixl 4 <=
 infixl 6 +
 infixl 7 *
 
-type GraphTestsuite g = (Eq g, Graph g) => g -> g -> g -> Property
+type GraphTestsuite g = (Eq g, EdgeGraph g) => g -> g -> g -> Property
 
 axioms :: GraphTestsuite g
 axioms x y z = conjoin
     [       x + y == y + x                      // "Overlay commutativity"
     , x + (y + z) == (x + y) + z                // "Overlay associativity"
-    ,   empty * x == x                          // "Left connect identity"
-    ,   x * empty == x                          // "Right connect identity"
-    , x * (y * z) == (x * y) * z                // "Connect associativity"
+    ,   empty * x == x                          // "Left into identity"
+    ,   x * empty == x                          // "Right into identity"
+    , x * (y * z) == (x * y) * z                // "Into associativity"
     , x * (y + z) == x * y + x * z              // "Left distributivity"
     , (x + y) * z == x * z + y * z              // "Right distributivity"
     ,   x * y * z == x * y + x * z + y * z      // "Decomposition" ]
@@ -67,30 +65,8 @@ theorems x y z = conjoin
     , x + y + x * y == x * y                    // "Absorption"
     ,     x * y * z == x * y + x * z + y * z
                      + x + y + z + empty        // "Full decomposition"
-    ,         x * x == x * x * x                // "Connect saturation"
+    ,         x * x == x * x * x                // "Into saturation"
     ,         empty <= x                        // "Lower bound"
     ,             x <= x + y                    // "Overlay order"
-    ,         x + y <= x * y                    // "Overlay-connect order" ]
+    ,         x + y <= x * y                    // "Overlay-into order" ]
 
-undirectedAxioms :: GraphTestsuite g
-undirectedAxioms x y z = conjoin
-    [ axioms x y z
-    , x * y == y * x                            // "Connect commutativity" ]
-
-reflexiveAxioms :: (Arbitrary (Vertex g), Show (Vertex g)) => GraphTestsuite g
-reflexiveAxioms x y z = conjoin
-    [ axioms x y z
-    , forAll arbitrary (\v -> vertex v `asTypeOf` x == vertex v * vertex v)
-                                                // "Vertex self-loop" ]
-
-transitiveAxioms :: Eq g => GraphTestsuite g
-transitiveAxioms x y z = conjoin
-    [ axioms x y z
-    , y == empty || x * y * z == x * y + y * z  // "Closure" ]
-
-preorderAxioms :: (Arbitrary (Vertex g), Eq g, Show (Vertex g)) => GraphTestsuite g
-preorderAxioms x y z = conjoin
-    [ axioms x y z
-    , forAll arbitrary (\v -> vertex v `asTypeOf` x == vertex v * vertex v)
-                                                // "Vertex self-loop"
-    , y == empty || x * y * z == x * y + y * z  // "Closure" ]

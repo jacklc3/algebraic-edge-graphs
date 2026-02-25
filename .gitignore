@@ -21,3 +21,6 @@ latex
 *.vrb
 *.hi
 *.o
+*dist-newstyle*
+.claude*
+out
