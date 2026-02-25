@@ -3,8 +3,7 @@ import Data.Char
 import Data.Foldable
 
 import EdgeGraph.Class
-import EdgeGraph.Fold (Fold, deBruijn, gmap, edgeIntSet, edgeSet,
-                           nodeCount)
+import EdgeGraph.Fold (Fold, deBruijn, gmap, edgeIntSet, edgeSet, nodeCount)
 
 import qualified Data.IntSet as IntSet
 import qualified Data.Set    as Set

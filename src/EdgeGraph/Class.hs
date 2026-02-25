@@ -156,18 +156,18 @@ instance EdgeGraph g => EdgeGraph (a -> g) where
     tips    x y = tips    <$> x <*> y
 
 instance (EdgeGraph g, EdgeGraph h) => EdgeGraph (g, h) where
-    type Edge (g, h)          = (Edge g     , Edge h     )
-    empty                     = (empty      , empty      )
-    edge  (x,  y )            = (edge  x    , edge  y    )
+    type Edge (g, h)          = (Edge g       , Edge h       )
+    empty                     = (empty        , empty        )
+    edge  (x,  y )            = (edge  x      , edge  y      )
     overlay (x1, y1) (x2, y2) = (overlay x1 x2, overlay y1 y2)
     into    (x1, y1) (x2, y2) = (into    x1 x2, into    y1 y2)
     pits    (x1, y1) (x2, y2) = (pits    x1 x2, pits    y1 y2)
     tips    (x1, y1) (x2, y2) = (tips    x1 x2, tips    y1 y2)
 
 instance (EdgeGraph g, EdgeGraph h, EdgeGraph i) => EdgeGraph (g, h, i) where
-    type Edge (g, h, i)               = (Edge g     , Edge h     , Edge i     )
-    empty                             = (empty      , empty      , empty      )
-    edge  (x,  y , z )                = (edge  x    , edge  y    , edge  z    )
+    type Edge (g, h, i)               = (Edge g       , Edge h       , Edge i       )
+    empty                             = (empty        , empty        , empty        )
+    edge  (x,  y , z )                = (edge  x      , edge  y      , edge  z      )
     overlay (x1, y1, z1) (x2, y2, z2) = (overlay x1 x2, overlay y1 y2, overlay z1 z2)
     into    (x1, y1, z1) (x2, y2, z2) = (into    x1 x2, into    y1 y2, into    z1 z2)
     pits    (x1, y1, z1) (x2, y2, z2) = (pits    x1 x2, pits    y1 y2, pits    z1 z2)

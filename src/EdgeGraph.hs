@@ -58,15 +58,6 @@ import qualified Data.Tree                    as Tree
 
 {-| The 'EdgeGraph' datatype is a deep embedding of the core edge graph
 construction primitives 'empty', 'edge', 'overlay', 'into', 'pits' and 'tips'.
-We define a law-abiding 'Num' instance as a convenient notation for working
-with edge graphs:
-
-    > 0           == Edge 0
-    > 1 + 2       == Edge 1 :++: Edge 2
-    > 1 * 2       == Edge 1 :>>: Edge 2
-    > 1 + 2 * 3   == Edge 1 :++: (Edge 2 :>>: Edge 3)
-    > 1 * (2 + 3) == Edge 1 :>>: (Edge 2 :++: Edge 3)
-
 The 'Eq' instance is implemented using the 'I.Incidence' as the /canonical
 graph representation/ and satisfies all axioms of algebraic edge graphs:
 
@@ -110,10 +101,10 @@ Note that 'size' is slightly different from the 'length' method of the
 'Foldable' type class, as the latter does not count 'Empty' leaves of the
 expression:
 
-@'length' 'empty'           == 0
-'size'   'empty'           == 1
-'length' ('edge' x)        == 1
-'size'   ('edge' x)        == 1
+@'length' 'empty'            == 0
+'size'   'empty'             == 1
+'length' ('edge' x)          == 1
+'size'   ('edge' x)          == 1
 'length' ('empty' + 'empty') == 0
 'size'   ('empty' + 'empty') == 2@
 
@@ -153,14 +144,6 @@ instance H.EdgeGraph EdgeGraph where
     into = (:>>:)
     pits = (:<>:)
     tips = (:><:)
-
-instance Num a => Num (EdgeGraph a) where
-    fromInteger = Edge . fromInteger
-    (+)         = (:++:)
-    (*)         = (:>>:)
-    signum      = const Empty
-    abs         = id
-    negate      = id
 
 instance Ord a => Eq (EdgeGraph a) where
     x == y = C.toEdgeGraph x == (C.toEdgeGraph y :: I.Incidence a)
@@ -298,11 +281,11 @@ intos = C.intos
 -- complexity of 'size' is /O(s)/, since all functions have cost /O(1)/.
 --
 -- @
--- foldg 'empty' 'edge'      'overlay' 'into' 'pits' 'tips' == id
--- foldg []    (\\x -> [x]) (++)    (++) (++) (++)       == 'Data.Foldable.toList'
--- foldg 0     (const 1)   (+)     (+)  (+)  (+)        == 'Data.Foldable.length'
--- foldg 1     (const 1)   (+)     (+)  (+)  (+)        == 'size'
--- foldg True  (const False) (&&)  (&&) (&&) (&&)       == 'isEmpty'
+-- foldg 'empty' 'edge' 'overlay' 'into' 'pits' 'tips' == id
+-- foldg []    (\\x -> [x])  (++)  (++) (++) (++)      == 'Data.Foldable.toList'
+-- foldg 0     (const 1)     (+)   (+)  (+)  (+)       == 'Data.Foldable.length'
+-- foldg 1     (const 1)     (+)   (+)  (+)  (+)       == 'size'
+-- foldg True  (const False) (&&)  (&&) (&&) (&&)      == 'isEmpty'
 -- @
 foldg :: b -> (a -> b) -> (b -> b -> b) -> (b -> b -> b) -> (b -> b -> b) -> (b -> b -> b) -> EdgeGraph a -> b
 foldg e v o c p t = go
