@@ -1,4 +1,4 @@
-{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE TypeApplications, ViewPatterns #-}
 module EdgeGraph.Test.Incidence (testIncidence) where
 
 import EdgeGraph.Incidence
@@ -16,7 +16,8 @@ sizeLimit = mapSize (min 10)
 testIncidence :: IO ()
 testIncidence = do
     putStrLn "\n============ Incidence ============"
-    test "Axioms of edge graphs" $ sizeLimit $ (axioms :: GraphTestsuite FI)
+    test "Axioms of edge graphs"      $ sizeLimit $ (axioms     :: GraphTestsuite FI)
+    test "Edge axioms of edge graphs"  $ sizeLimit $ (edgeAxioms @FI)
 
     test "Consistency of arbitraryIncidence" $ sizeLimit $ \(m :: FI) ->
         consistent m
@@ -24,10 +25,10 @@ testIncidence = do
     putStrLn "\n============ Show ============"
     test "show (empty     :: Incidence Int) == \"empty\"" $
           show (empty     :: Incidence Int) == "empty"
-    test "show (1         :: Incidence Int) == \"edge 1\"" $
-          show (1         :: Incidence Int) == "edge 1"
-    test "show (1 + 2     :: Incidence Int) == \"edges [1,2]\"" $
-          show (1 + 2     :: Incidence Int) == "edges [1,2]"
+    test "show (edge 1    :: Incidence Int) == \"edge 1\"" $
+          show (edge 1    :: Incidence Int) == "edge 1"
+    test "show (overlay (edge 1) (edge 2) :: Incidence Int) == \"edges [1,2]\"" $
+          show (overlay (edge 1) (edge 2) :: Incidence Int) == "edges [1,2]"
 
     putStrLn "\n============ empty ============"
     test "isEmpty     empty == True" $

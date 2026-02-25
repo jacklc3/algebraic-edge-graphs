@@ -1,4 +1,4 @@
-{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE TypeApplications, ViewPatterns #-}
 module EdgeGraph.Test.IntAdjacencyMap (testIntAdjacencyMap) where
 
 import Data.Tree (Tree (..))
@@ -16,7 +16,8 @@ sizeLimit = mapSize (min 10)
 testIntAdjacencyMap :: IO ()
 testIntAdjacencyMap = do
     putStrLn "\n============ IntAdjacencyMap ============"
-    test "Axioms of edge graphs" $ sizeLimit $ (axioms :: GraphTestsuite IntAdjacencyMap)
+    test "Axioms of edge graphs"      $ sizeLimit $ (axioms     :: GraphTestsuite IntAdjacencyMap)
+    test "Edge axioms of edge graphs"  $ sizeLimit $ (edgeAxioms @IntAdjacencyMap)
 
     test "Consistency of arbitraryIntAdjacencyMap" $ sizeLimit $ \m ->
         consistent m

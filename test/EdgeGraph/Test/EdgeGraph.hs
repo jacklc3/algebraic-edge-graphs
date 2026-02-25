@@ -1,4 +1,4 @@
-{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE TypeApplications, ViewPatterns #-}
 module EdgeGraph.Test.EdgeGraph (testGraph) where
 
 import Data.Foldable
@@ -17,8 +17,9 @@ sizeLimit = mapSize (min 10)
 testGraph :: IO ()
 testGraph = do
     putStrLn "\n============ EdgeGraph ============"
-    test "Axioms of edge graphs"   $ sizeLimit $ (axioms   :: GraphTestsuite G)
-    test "Theorems of edge graphs" $ sizeLimit $ (theorems :: GraphTestsuite G)
+    test "Axioms of edge graphs"      $ sizeLimit $ (axioms     :: GraphTestsuite G)
+    test "Edge axioms of edge graphs"  $ sizeLimit $ (edgeAxioms @G)
+    test "Theorems of edge graphs"     $ sizeLimit $ (theorems   :: GraphTestsuite G)
 
     putStrLn "\n============ empty ============"
     test "isEmpty     empty == True" $
@@ -87,14 +88,14 @@ testGraph = do
           isSubgraphOf (overlay x y) (into x y)    == True
 
     putStrLn "\n============ (===) ============"
-    test "    x === x         == True" $ sizeLimit $ \(x :: G) ->
-             (x === x)        == True
-    test "    x === x + empty == False" $ sizeLimit $ \(x :: G) ->
-             (x === x + empty)== False
-    test "x + y === x + y     == True" $ sizeLimit $ \(x :: G) y ->
-         (x + y === x + y)    == True
-    test "1 + 2 === 2 + 1     == False" $
-         (1 + 2 === 2 + (1 :: G)) == False
+    test "    x === x                          == True" $ sizeLimit $ \(x :: G) ->
+             (x === x)                         == True
+    test "    x === overlay x empty            == False" $ sizeLimit $ \(x :: G) ->
+             (x === overlay x empty)           == False
+    test "overlay x y === overlay x y          == True" $ sizeLimit $ \(x :: G) y ->
+         (overlay x y === overlay x y)         == True
+    test "overlay (edge 1) (edge 2) === overlay (edge 2) (edge 1) == False" $
+         (overlay (edge 1) (edge 2) === overlay (edge 2) (edge (1 :: Int))) == False
 
     putStrLn "\n============ isEmpty ============"
     test "isEmpty empty                             == True" $

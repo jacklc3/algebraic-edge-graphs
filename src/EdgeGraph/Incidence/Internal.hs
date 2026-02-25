@@ -107,14 +107,6 @@ instance Ord a => C.EdgeGraph (Incidence a) where
     pits    = pits
     tips    = tips
 
-instance (Ord a, Num a) => Num (Incidence a) where
-    fromInteger = edge . fromInteger
-    (+)         = overlay
-    (*)         = into
-    signum      = const empty
-    abs         = id
-    negate      = id
-
 -- | Check if a flow representation is consistent:
 --
 -- 1. No (∅,∅) nodes

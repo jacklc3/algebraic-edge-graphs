@@ -65,14 +65,6 @@ instance C.EdgeGraph IntAdjacencyMap where
     pits    = pits
     tips    = tips
 
-instance Num IntAdjacencyMap where
-    fromInteger = edge . fromInteger
-    (+)         = overlay
-    (*)         = into
-    signum      = const empty
-    abs         = id
-    negate      = id
-
 -- | Convert an 'IntAdjacencyMap' to its equivalent 'I.Incidence' representation.
 toIncidence :: IntAdjacencyMap -> I.Incidence Int
 toIncidence (IntAdjacencyMap m)

@@ -58,58 +58,33 @@ import qualified Data.Set                     as Set
 
 {-| The 'Fold' datatype is the Boehm-Berarducci encoding of the core edge graph
 construction primitives 'empty', 'edge', 'overlay', 'into', 'pits' and 'tips'.
-We define a law-abiding 'Num' instance as a convenient notation for working
-with graphs:
-
-    > 0           == edge 0
-    > 1 + 2       == overlay (edge 1) (edge 2)
-    > 1 * 2       == into (edge 1) (edge 2)
-    > 1 + 2 * 3   == overlay (edge 1) (into (edge 2) (edge 3))
-    > 1 * (2 + 3) == into (edge 1) (overlay (edge 2) (edge 3))
 
 The 'Show' instance is defined using basic graph construction primitives:
 
-@show ('empty'     :: Fold Int) == "empty"
-show (1         :: Fold Int) == "edge 1"
-show (1 + 2     :: Fold Int) == "edges [1,2]"
-show (1 * 2     :: Fold Int) == "into (edge 1) (edge 2)"@
+@show ('empty'                            :: Fold Int) == "empty"
+show ('edge' 1                           :: Fold Int) == "edge 1"
+show ('overlay' ('edge' 1) ('edge' 2)    :: Fold Int) == "edges [1,2]"
+show ('into' ('edge' 1) ('edge' 2)       :: Fold Int) == "into (edge 1) (edge 2)"@
 
 The 'Eq' instance is currently implemented using the 'I.Incidence' as the
 /canonical graph representation/ and satisfies all axioms of algebraic edge
-graphs:
+graphs. In equations we use the infix operators '(+++)' for 'overlay',
+'(>+>)' for 'into', '(<+>)' for 'pits', and '(>+<)' for 'tips'.
 
-    * 'overlay' is commutative and associative:
+    * 'overlay' is commutative, associative, and idempotent with 'empty' as
+      the identity.
 
-        >       x + y == y + x
-        > x + (y + z) == (x + y) + z
+    * 'empty' is the identity for 'into', 'pits', and 'tips'. 'pits' and
+      'tips' are commutative.
 
-    * 'into' is associative and has 'empty' as the identity:
+    * Decomposition: for any two connect operators @f@ and @g@ (each being
+      any of '(>+>)', '(<+>)', or '(>+<)'):
 
-        >   x * empty == x
-        >   empty * x == x
-        > x * (y * z) == (x * y) * z
+        > f x (g y z) == f x y +++ f x z +++ g y z
+        > g (f x y) z == f x y +++ g x z +++ g y z
 
-    * 'into' distributes over 'overlay':
-
-        > x * (y + z) == x * y + x * z
-        > (x + y) * z == x * z + y * z
-
-    * 'into' can be decomposed:
-
-        > x * y * z == x * y + x * z + y * z
-
-The following useful theorems can be proved from the above set of axioms.
-
-    * 'overlay' has 'empty' as the identity and is idempotent:
-
-        >   x + empty == x
-        >   empty + x == x
-        >       x + x == x
-
-    * Absorption and saturation of 'into':
-
-        > x * y + x + y == x * y
-        >     x * x * x == x * x
+    * Reflexivity on single edges and transitivity for non-empty graphs
+      (see "EdgeGraph.Class" for the full axiom listing).
 
 When specifying the time and memory complexity of graph algorithms, /n/ will
 denote the number of edges in the graph, /m/ will denote the number of
@@ -156,14 +131,6 @@ instance C.EdgeGraph (Fold a) where
     into    x y = Fold $ \e v o i p t -> runFold x e v o i p t `i` runFold y e v o i p t
     pits    x y = Fold $ \e v o i p t -> runFold x e v o i p t `p` runFold y e v o i p t
     tips    x y = Fold $ \e v o i p t -> runFold x e v o i p t `t` runFold y e v o i p t
-
-instance Num a => Num (Fold a) where
-    fromInteger = C.edge . fromInteger
-    (+)         = C.overlay
-    (*)         = C.into
-    signum      = const C.empty
-    abs         = id
-    negate      = id
 
 instance Functor Fold where
     fmap = gmap

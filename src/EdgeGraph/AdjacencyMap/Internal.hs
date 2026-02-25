@@ -80,14 +80,6 @@ instance Ord a => C.EdgeGraph (AdjacencyMap a) where
     pits    = pits
     tips    = tips
 
-instance (Ord a, Num a) => Num (AdjacencyMap a) where
-    fromInteger = edge . fromInteger
-    (+)         = overlay
-    (*)         = into
-    signum      = const empty
-    abs         = id
-    negate      = id
-
 -- | Convert an 'AdjacencyMap' to its equivalent 'I.Incidence' representation.
 --
 -- For each edge, reconstruct its source node (pitNode) and sink node (tipNode),

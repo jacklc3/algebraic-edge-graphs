@@ -68,47 +68,69 @@ corresponds to the /empty graph/. This module simply re-exports it.
 * Graph 'overlay' is an alias for '<|>' of the 'Alternative' type class.
 
 The 'EdgeGraph' type class is characterised by the following minimal set of
-axioms. In equations we use @+@ and @*@ as convenient shortcuts for 'overlay'
-and 'into', respectively.
+axioms. In equations we use the infix operators '(+++)' for 'overlay',
+'(>+>)' for 'into', '(<+>)' for 'pits', and '(>+<)' for 'tips'.
 
-    * 'overlay' is commutative and associative:
+    * 'overlay' is commutative, associative, and idempotent with 'empty' as
+      the identity:
 
-        >       x + y == y + x
-        > x + (y + z) == (x + y) + z
+        >         x +++ y == y +++ x
+        > x +++ (y +++ z) == (x +++ y) +++ z
+        >         x +++ x == x
+        >     x +++ empty == x
 
-    * 'into' is associative and has 'empty' as the identity:
+    * 'empty' is the identity for 'into', 'pits', and 'tips':
 
-        >   x * empty == x
-        >   empty * x == x
-        > x * (y * z) == (x * y) * z
+        > empty >+> x == x
+        > x >+> empty == x
+        > empty <+> x == x
+        > x <+> empty == x
+        > empty >+< x == x
+        > x >+< empty == x
 
-    * 'into' distributes over 'overlay':
+    * 'pits' and 'tips' are commutative:
 
-        > x * (y + z) == x * y + x * z
-        > (x + y) * z == x * z + y * z
+        > x <+> y == y <+> x
+        > x >+< y == y >+< x
 
-    * 'into' can be decomposed:
+    * Decomposition: for any two connect operators @f@ and @g@ (each being
+      any of '(>+>)', '(<+>)', or '(>+<)'):
 
-        > x * y * z == x * y + x * z + y * z
+        > f x (g y z) == f x y +++ f x z +++ g y z
+        > g (f x y) z == f x y +++ g x z +++ g y z
 
-    * 'pits' and 'tips' satisfy analogous axioms (each forms a united monoid
-      with 'overlay'), plus reflexivity on edges:
+    * Reflexivity on single edges:
 
-        > pits (edge a) (edge a) == edge a
-        > tips (edge a) (edge a) == edge a
+        > edge a <+> edge a == edge a
+        > edge a >+< edge a == edge a
+
+    * Transitivity (for non-empty @a@):
+
+        > a <+> b +++ a <+> c == a <+> (b <+> c)
+        > b >+> a +++ a <+> c == b >+> (a <+> c)
+        > a >+> b +++ a >+> c == a >+> (b <+> c)
+        > a >+< b +++ a >+> c == (a >+< b) >+> c
+        > b >+> a +++ c >+> a == (b >+< c) >+> a
+        > a >+< b +++ a >+< c == a >+< (b >+< c)
 
 The following useful theorems can be proved from the above set of axioms.
 
-    * 'overlay' has 'empty' as the identity and is idempotent:
+    * Associativity of all connect operators:
 
-        >   x + empty == x
-        >   empty + x == x
-        >       x + x == x
+        > x >+> (y >+> z) == (x >+> y) >+> z
+        > x <+> (y <+> z) == (x <+> y) <+> z
+        > x >+< (y >+< z) == (x >+< y) >+< z
 
-    * Absorption and saturation of 'into':
+    * Distributivity over 'overlay':
 
-        > x * y + x + y == x * y
-        >     x * x * x == x * x
+        > x >+> (y +++ z) == x >+> y +++ x >+> z
+        > x <+> (y +++ z) == x <+> y +++ x <+> z
+        > x >+< (y +++ z) == x >+< y +++ x >+< z
+
+    * Absorption and saturation for each connect operator (shown for 'into'):
+
+        > x >+> y +++ x +++ y == x >+> y
+        > x >+> x == (x >+> x) >+> x
 
 When specifying the time and memory complexity of graph algorithms, /n/ will
 denote the number of edges in the graph, /m/ will denote the number of

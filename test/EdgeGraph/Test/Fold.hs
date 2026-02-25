@@ -1,4 +1,4 @@
-{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE TypeApplications, ViewPatterns #-}
 module EdgeGraph.Test.Fold (testFold) where
 
 import Data.Foldable
@@ -18,13 +18,14 @@ sizeLimit = mapSize (min 10)
 testFold :: IO ()
 testFold = do
     putStrLn "\n============ Fold ============"
-    test "Axioms of edge graphs"   $ sizeLimit $ (axioms :: GraphTestsuite F)
+    test "Axioms of edge graphs"      $ sizeLimit $ (axioms     :: GraphTestsuite F)
+    test "Edge axioms of edge graphs"  $ sizeLimit $ (edgeAxioms @F)
 
     putStrLn "\n============ Show ============"
     test "show (empty :: Fold Int) == \"empty\"" $
           show (empty :: Fold Int) == "empty"
-    test "show (1     :: Fold Int) == \"edge 1\"" $
-          show (1     :: Fold Int) == "edge 1"
+    test "show (edge 1 :: Fold Int) == \"edge 1\"" $
+          show (edge 1 :: Fold Int) == "edge 1"
 
     putStrLn "\n============ empty ============"
     test "isEmpty     empty == True" $

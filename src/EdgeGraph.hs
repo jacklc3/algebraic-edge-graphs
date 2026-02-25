@@ -59,40 +59,42 @@ import qualified Data.Tree                    as Tree
 {-| The 'EdgeGraph' datatype is a deep embedding of the core edge graph
 construction primitives 'empty', 'edge', 'overlay', 'into', 'pits' and 'tips'.
 The 'Eq' instance is implemented using the 'I.Incidence' as the /canonical
-graph representation/ and satisfies all axioms of algebraic edge graphs:
+graph representation/ and satisfies all axioms of algebraic edge graphs.
+In equations we use the infix operators '(+++)' for 'overlay', '(>+>)' for
+'into', '(<+>)' for 'pits', and '(>+<)' for 'tips'.
 
-    * 'overlay' is commutative and associative:
+    * 'overlay' is commutative, associative, and idempotent with 'empty' as
+      the identity:
 
-        >       x + y == y + x
-        > x + (y + z) == (x + y) + z
+        >         x +++ y == y +++ x
+        > x +++ (y +++ z) == (x +++ y) +++ z
+        >         x +++ x == x
+        >     x +++ empty == x
 
-    * 'into' is associative and has 'empty' as the identity:
+    * 'empty' is the identity for 'into', 'pits', and 'tips'. 'pits' and
+      'tips' are commutative.
 
-        >   x * empty == x
-        >   empty * x == x
-        > x * (y * z) == (x * y) * z
+    * Decomposition: for any two connect operators @f@ and @g@ (each being
+      any of '(>+>)', '(<+>)', or '(>+<)'):
 
-    * 'into' distributes over 'overlay':
+        > f x (g y z) == f x y +++ f x z +++ g y z
+        > g (f x y) z == f x y +++ g x z +++ g y z
 
-        > x * (y + z) == x * y + x * z
-        > (x + y) * z == x * z + y * z
-
-    * 'into' can be decomposed:
-
-        > x * y * z == x * y + x * z + y * z
+    * Reflexivity on single edges, and transitivity for non-empty graphs
+      (see "EdgeGraph.Class" for the full axiom listing).
 
 The following useful theorems can be proved from the above set of axioms.
 
-    * 'overlay' has 'empty' as the identity and is idempotent:
+    * Associativity of all connect operators.
 
-        >   x + empty == x
-        >   empty + x == x
-        >       x + x == x
+    * Distributivity over 'overlay':
 
-    * Absorption and saturation of 'into':
+        > x >+> (y +++ z) == x >+> y +++ x >+> z
 
-        > x * y + x + y == x * y
-        >     x * x * x == x * x
+    * Absorption and saturation for each connect operator (shown for 'into'):
+
+        > x >+> y +++ x +++ y == x >+> y
+        > x >+> x == (x >+> x) >+> x
 
 When specifying the time and memory complexity of graph algorithms, /s/ will
 denote the /size/ of the corresponding 'EdgeGraph' expression.
@@ -105,8 +107,8 @@ expression:
 'size'   'empty'             == 1
 'length' ('edge' x)          == 1
 'size'   ('edge' x)          == 1
-'length' ('empty' + 'empty') == 0
-'size'   ('empty' + 'empty') == 2@
+'length' ('empty' '+++' 'empty') == 0
+'size'   ('empty' '+++' 'empty') == 2@
 
 The 'size' of any graph is positive, and the difference @('size' g - 'length' g)@
 corresponds to the number of occurrences of 'empty' in an expression @g@.
@@ -315,11 +317,10 @@ isSubgraphOf x y = I.isSubgraphOf (C.toEdgeGraph x) (C.toEdgeGraph y)
 -- Complexity: /O(s)/ time.
 --
 -- @
---     x === x           == True
---     x === x + 'empty' == False
--- x + y === x + y       == True
--- 1 + 2 === 2 + 1       == False
--- x + y === x * y       == False
+--                     x === x                         == True
+--                     x === 'overlay' x 'empty'       == False
+-- 'overlay' x y === 'overlay' x y                     == True
+-- 'overlay' ('edge' 1) ('edge' 2) === 'overlay' ('edge' 2) ('edge' 1) == False
 -- @
 (===) :: Eq a => EdgeGraph a -> EdgeGraph a -> Bool
 Empty        === Empty        = True
@@ -640,7 +641,7 @@ induce p = foldg Empty (\x -> if p x then Edge x else Empty) (:++:) (:>>:) (:<>:
 -- 'size' (simplify x)       <= 'size' x
 -- simplify 'empty'         '===' 'empty'
 -- simplify ('edge' 1)      '===' 'edge' 1
--- simplify ('edge' 1 + 'edge' 1) '===' 'edge' 1
+-- simplify ('edge' 1 '+++' 'edge' 1) '===' 'edge' 1
 -- @
 simplify :: Ord a => EdgeGraph a -> EdgeGraph a
 simplify = foldg Empty Edge (simple (:++:)) (simple (:>>:)) (simple (:<>:)) (simple (:><:))
