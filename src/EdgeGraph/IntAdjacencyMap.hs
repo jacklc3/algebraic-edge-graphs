@@ -34,7 +34,7 @@ module EdgeGraph.IntAdjacencyMap (
     postset, preset,
 
     -- * Standard families of graphs
-    path, circuit, clique, biclique, star, tree, forest,
+    path, circuit, clique, biclique, flower, node, tree, forest,
 
     -- * Graph transformation
     replaceEdge, mergeEdges, detachPit, detachTip, gmap, induce,
@@ -74,8 +74,11 @@ clique = C.clique
 biclique :: [Int] -> [Int] -> IntAdjacencyMap
 biclique = C.biclique
 
-star :: Int -> [Int] -> IntAdjacencyMap
-star = C.star
+flower :: [Int] -> IntAdjacencyMap
+flower = C.flower
+
+node :: [Int] -> [Int] -> IntAdjacencyMap
+node = C.node
 
 tree :: Tree Int -> IntAdjacencyMap
 tree = C.tree

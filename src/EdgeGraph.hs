@@ -36,7 +36,7 @@ module EdgeGraph (
     edgeIntSet, nodeCount, nodeList, nodeSet,
 
     -- * Standard families of graphs
-    path, circuit, clique, biclique, star, tree, forest, mesh, torus, deBruijn,
+    path, circuit, clique, biclique, flower, node, tree, forest, mesh, torus, deBruijn,
 
     -- * Graph transformation
     removeEdge, replaceEdge, mergeEdges, splitEdge,
@@ -446,26 +446,28 @@ nodeList = I.nodeList . C.toEdgeGraph
 nodeSet :: Ord a => EdgeGraph a -> Set.Set (I.Node a)
 nodeSet = I.nodeSet . C.toEdgeGraph
 
--- | The /path/ on a list of edges, using 'into' as the connect operator.
+-- | The /path/ on a list of edges, connecting consecutive edges via 'into'.
 -- Complexity: /O(L)/ time, memory and size, where /L/ is the length of the
 -- given list.
 --
 -- @
--- path []    == 'empty'
--- path [x]   == 'edge' x
--- path [x,y] == 'into' ('edge' x) ('edge' y)
+-- path []      == 'empty'
+-- path [x]     == 'edge' x
+-- path [x,y]   == 'into' ('edge' x) ('edge' y)
+-- path [x,y,z] == 'overlays' ['into' ('edge' x) ('edge' y), 'into' ('edge' y) ('edge' z)]
 -- @
 path :: [a] -> EdgeGraph a
 path = C.path
 
--- | The /circuit/ on a list of edges.
+-- | The /circuit/ on a list of edges, connecting consecutive edges via 'into'
+-- in a cycle.
 -- Complexity: /O(L)/ time, memory and size, where /L/ is the length of the
 -- given list.
 --
 -- @
 -- circuit []    == 'empty'
 -- circuit [x]   == 'into' ('edge' x) ('edge' x)
--- circuit [x,y] == 'into' ('edge' x) ('into' ('edge' y) ('edge' x))
+-- circuit [x,y] == 'overlays' ['into' ('edge' x) ('edge' y), 'into' ('edge' y) ('edge' x)]
 -- @
 circuit :: [a] -> EdgeGraph a
 circuit = C.circuit
@@ -494,17 +496,34 @@ clique = C.clique
 biclique :: [a] -> [a] -> EdgeGraph a
 biclique = C.biclique
 
--- | The /star/ formed by a centre edge and a list of leaf edges.
+-- | The /flower graph/ on a list of edges. All edges are fully connected via
+-- 'into' in a loop, forming petal-like structures around a central node.
 -- Complexity: /O(L)/ time, memory and size, where /L/ is the length of the
 -- given list.
 --
 -- @
--- star x []    == 'edge' x
--- star x [y]   == 'into' ('edge' x) ('edge' y)
--- star x [y,z] == 'into' ('edge' x) ('edges' [y, z])
+-- flower []      == 'empty'
+-- flower [x]     == 'into' ('edge' x) ('edge' x)
+-- flower [x,y]   == 'intos' ['edge' x, 'edge' y, 'edge' x]
 -- @
-star :: a -> [a] -> EdgeGraph a
-star = C.star
+flower :: [a] -> EdgeGraph a
+flower = C.flower
+
+-- | Construct a /node/ from a list of incoming edges and a list of outgoing
+-- edges. The incoming edges share a common pit at the node, and the outgoing
+-- edges share a common tip at the node.
+-- Complexity: /O(L1 + L2)/ time, memory and size, where /L1/ and /L2/ are the
+-- lengths of the given lists.
+--
+-- @
+-- node []  []    == 'empty'
+-- node [x] []    == 'edge' x
+-- node []  [y]   == 'edge' y
+-- node [x] [y]   == 'into' ('edge' x) ('edge' y)
+-- node [x] [y,z] == 'into' ('edge' x) ('tips' ('edge' y) ('edge' z))
+-- @
+node :: [a] -> [a] -> EdgeGraph a
+node = C.node
 
 -- | The /tree graph/ constructed from a given 'Tree' data structure.
 -- Complexity: /O(T)/ time, memory and size, where /T/ is the size of the

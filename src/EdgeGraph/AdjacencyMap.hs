@@ -36,7 +36,7 @@ module EdgeGraph.AdjacencyMap (
     postset, preset,
 
     -- * Standard families of graphs
-    path, circuit, clique, biclique, star, tree, forest,
+    path, circuit, clique, biclique, flower, node, tree, forest,
 
     -- * Graph transformation
     replaceEdge, mergeEdges, detachPit, detachTip, gmap, induce,
@@ -86,9 +86,14 @@ clique = C.clique
 biclique :: Ord a => [a] -> [a] -> AdjacencyMap a
 biclique = C.biclique
 
--- | The /star/ formed by a centre edge and a list of leaf edges.
-star :: Ord a => a -> [a] -> AdjacencyMap a
-star = C.star
+-- | The /flower graph/ on a list of edges.
+flower :: Ord a => [a] -> AdjacencyMap a
+flower = C.flower
+
+-- | Construct a /node/ from a list of incoming edges and a list of outgoing
+-- edges.
+node :: Ord a => [a] -> [a] -> AdjacencyMap a
+node = C.node
 
 -- | The /tree graph/ constructed from a given 'Tree' data structure.
 tree :: Ord a => Tree a -> AdjacencyMap a

@@ -32,7 +32,7 @@ module EdgeGraph.Class (
     isSubgraphOf,
 
     -- * Standard families of graphs
-    path, circuit, clique, biclique, star, tree, forest,
+    path, circuit, clique, biclique, flower, node, tree, forest,
 
     -- * Conversion between graph data types
     ToEdgeGraph (..)
@@ -256,34 +256,37 @@ tipss = foldr tips empty
 isSubgraphOf :: (EdgeGraph g, Eq g) => g -> g -> Bool
 isSubgraphOf x y = overlay x y == y
 
--- | The /path/ on a list of edges, using 'into' as the connect operator.
+-- | The /path/ on a list of edges, connecting consecutive edges via 'into'.
 -- Complexity: /O(L)/ time, memory and size, where /L/ is the length of the
 -- given list.
 --
 -- @
--- path []    == 'empty'
--- path [x]   == 'edge' x
--- path [x,y] == 'into' ('edge' x) ('edge' y)
+-- path []      == 'empty'
+-- path [x]     == 'edge' x
+-- path [x,y]   == 'into' ('edge' x) ('edge' y)
+-- path [x,y,z] == 'overlays' ['into' ('edge' x) ('edge' y), 'into' ('edge' y) ('edge' z)]
 -- @
 path :: EdgeGraph g => [Edge g] -> g
 path []  = empty
 path [x] = edge x
-path xs  = intos (map edge xs)
+path xs  = overlays $ zipWith (\a b -> into (edge a) (edge b)) xs (drop 1 xs)
 
--- | The /circuit/ on a list of edges.
+-- | The /circuit/ on a list of edges, connecting consecutive edges via 'into'
+-- in a cycle.
 -- Complexity: /O(L)/ time, memory and size, where /L/ is the length of the
 -- given list.
 --
 -- @
 -- circuit []    == 'empty'
 -- circuit [x]   == 'into' ('edge' x) ('edge' x)
--- circuit [x,y] == 'into' ('edge' x) ('into' ('edge' y) ('edge' x))
+-- circuit [x,y] == 'overlays' ['into' ('edge' x) ('edge' y), 'into' ('edge' y) ('edge' x)]
 -- @
 circuit :: EdgeGraph g => [Edge g] -> g
-circuit []     = empty
-circuit (x:xs) = path $ [x] ++ xs ++ [x]
+circuit []       = empty
+circuit (x : xs) = overlays $ zipWith (\a b -> into (edge a) (edge b)) (x : xs) (xs ++ [x])
 
--- | The /clique/ on a list of edges (fully connected via 'into').
+-- | The /clique/ on a list of edges (fully connected via 'into'). Each edge
+-- connects to every later edge in the list, due to the decomposition axiom.
 -- Complexity: /O(L)/ time, memory and size, where /L/ is the length of the
 -- given list.
 --
@@ -295,7 +298,8 @@ circuit (x:xs) = path $ [x] ++ xs ++ [x]
 clique :: EdgeGraph g => [Edge g] -> g
 clique = intos . map edge
 
--- | The /biclique/ on two lists of edges.
+-- | The /biclique/ on two lists of edges. Every edge in the first list
+-- connects to every edge in the second list via 'into'.
 -- Complexity: /O(L1 + L2)/ time, memory and size, where /L1/ and /L2/ are the
 -- lengths of the given lists.
 --
@@ -307,23 +311,47 @@ clique = intos . map edge
 biclique :: EdgeGraph g => [Edge g] -> [Edge g] -> g
 biclique xs ys = into (edges xs) (edges ys)
 
--- | The /star/ formed by a centre edge and a list of leaf edges.
+-- | The /flower graph/ on a list of edges. All edges are fully connected via
+-- 'into' in a loop, forming petal-like structures around a central node.
+-- This is equivalent to a 'clique' where the first edge is repeated at the
+-- end, creating a cycle through the 'into' operator.
 -- Complexity: /O(L)/ time, memory and size, where /L/ is the length of the
 -- given list.
 --
 -- @
--- star x []    == 'edge' x
--- star x [y]   == 'into' ('edge' x) ('edge' y)
--- star x [y,z] == 'into' ('edge' x) ('edges' [y, z])
+-- flower []      == 'empty'
+-- flower [x]     == 'into' ('edge' x) ('edge' x)
+-- flower [x,y]   == 'intos' ['edge' x, 'edge' y, 'edge' x]
+-- flower [x,y,z] == 'intos' ['edge' x, 'edge' y, 'edge' z, 'edge' x]
 -- @
-star :: EdgeGraph g => Edge g -> [Edge g] -> g
-star x ys = into (edge x) (edges ys)
+flower :: EdgeGraph g => [Edge g] -> g
+flower []       = empty
+flower (x : xs) = intos (map edge (x : xs ++ [x]))
+
+-- | Construct a /node/ from a list of incoming edges and a list of outgoing
+-- edges. The incoming edges share a common pit at the node, and the outgoing
+-- edges share a common tip at the node. When one of the lists is empty, 'pits'
+-- or 'tips' is used to ensure the remaining edges are still connected at the
+-- node.
+-- Complexity: /O(L1 + L2)/ time, memory and size, where /L1/ and /L2/ are the
+-- lengths of the given lists.
+--
+-- @
+-- node []  []    == 'empty'
+-- node [x] []    == 'edge' x
+-- node []  [y]   == 'edge' y
+-- node [x] [y]   == 'into' ('edge' x) ('edge' y)
+-- node [x] [y,z] == 'into' ('edge' x) ('tips' ('edge' y) ('edge' z))
+-- node [x,y] [z] == 'into' ('pits' ('edge' x) ('edge' y)) ('edge' z)
+-- @
+node :: EdgeGraph g => [Edge g] -> [Edge g] -> g
+node xs ys = pitss (map edge xs) `into` tipss (map edge ys)
 
 -- | The /tree graph/ constructed from a given 'Tree' data structure.
 -- Complexity: /O(T)/ time, memory and size, where /T/ is the size of the
 -- given tree.
 tree :: EdgeGraph g => Tree (Edge g) -> g
-tree (Node x f) = overlay (star x $ map rootLabel f) (forest f)
+tree (Node x f) = overlay (into (edge x) (edges (map rootLabel f))) (forest f)
 
 -- | The /forest graph/ constructed from a given 'Forest' data structure.
 -- Complexity: /O(F)/ time, memory and size, where /F/ is the size of the

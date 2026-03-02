@@ -28,7 +28,7 @@ module EdgeGraph.Incidence (
     edgeList, nodeList, edgeSet, nodeSet, edgeIntSet,
 
     -- * Standard families of graphs
-    path, circuit, clique, biclique, star, tree, forest,
+    path, circuit, clique, biclique, flower, node, tree, forest,
 
     -- * Graph transformation
     replaceEdge, mergeEdges, detachPit, detachTip, gmap, induce,
@@ -77,26 +77,28 @@ overlays = C.overlays
 intos :: Ord a => [Incidence a] -> Incidence a
 intos = C.intos
 
--- | The /path/ on a list of edges, using 'into' as the connect operator.
+-- | The /path/ on a list of edges, connecting consecutive edges via 'into'.
 -- Complexity: /O(L * log(L))/ time and /O(L)/ memory, where /L/ is the length
 -- of the given list.
 --
 -- @
--- path []    == 'empty'
--- path [x]   == 'edge' x
--- path [x,y] == 'into' ('edge' x) ('edge' y)
+-- path []      == 'empty'
+-- path [x]     == 'edge' x
+-- path [x,y]   == 'into' ('edge' x) ('edge' y)
+-- path [x,y,z] == 'overlays' ['into' ('edge' x) ('edge' y), 'into' ('edge' y) ('edge' z)]
 -- @
 path :: Ord a => [a] -> Incidence a
 path = C.path
 
--- | The /circuit/ on a list of edges.
+-- | The /circuit/ on a list of edges, connecting consecutive edges via 'into'
+-- in a cycle.
 -- Complexity: /O(L * log(L))/ time and /O(L)/ memory, where /L/ is the length
 -- of the given list.
 --
 -- @
 -- circuit []    == 'empty'
 -- circuit [x]   == 'into' ('edge' x) ('edge' x)
--- circuit [x,y] == 'into' ('edge' x) ('into' ('edge' y) ('edge' x))
+-- circuit [x,y] == 'overlays' ['into' ('edge' x) ('edge' y), 'into' ('edge' y) ('edge' x)]
 -- @
 circuit :: Ord a => [a] -> Incidence a
 circuit = C.circuit
@@ -125,17 +127,23 @@ clique = C.clique
 biclique :: Ord a => [a] -> [a] -> Incidence a
 biclique = C.biclique
 
--- | The /star/ formed by a centre edge and a list of leaf edges.
--- Complexity: /O(L * log(L))/ time and /O(L)/ memory, where /L/ is the length
--- of the given list.
+-- | The /flower graph/ on a list of edges.
+flower :: Ord a => [a] -> Incidence a
+flower = C.flower
+
+-- | Construct a /node/ from a list of incoming edges and a list of outgoing
+-- edges.
+-- Complexity: /O(L * log(L))/ time and /O(L)/ memory, where /L/ is the total
+-- length of the given lists.
 --
 -- @
--- star x []    == 'edge' x
--- star x [y]   == 'into' ('edge' x) ('edge' y)
--- star x [y,z] == 'into' ('edge' x) ('edges' [y, z])
+-- node []  []    == 'empty'
+-- node [x] []    == 'edge' x
+-- node []  [y]   == 'edge' y
+-- node [x] [y]   == 'into' ('edge' x) ('edge' y)
 -- @
-star :: Ord a => a -> [a] -> Incidence a
-star = C.star
+node :: Ord a => [a] -> [a] -> Incidence a
+node = C.node
 
 -- | The /tree graph/ constructed from a given 'Tree' data structure.
 -- Complexity: /O(T * log(T))/ time and /O(T)/ memory, where /T/ is the size

@@ -187,8 +187,8 @@ testIntAdjacencyMap = do
           topSort (into (edge 1) (edge 2)) == Just [1,2]
     test "topSort (circuit [1,2]) == Nothing" $
           topSort (circuit [1,2]) == Nothing
-    test "topSort (path [1,2,3]) == Nothing (transit node self-loop)" $
-          topSort (path [1,2,3]) == Nothing
+    test "topSort (path [1,2,3]) == Just [1,2,3]" $
+          topSort (path [1,2,3]) == Just [1,2,3]
     test "fmap (flip isTopSort x) (topSort x) /= Just False" $ sizeLimit $ \x ->
           fmap (flip isTopSort x) (topSort x) /= Just False
 

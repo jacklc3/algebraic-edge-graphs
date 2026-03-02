@@ -23,7 +23,7 @@ module EdgeGraph.Fold (
 
     -- * Basic graph construction primitives
     empty, edge, overlay, into, pits, tips, edges, overlays, intos,
-    C.path, C.circuit, C.clique, C.biclique, C.star, C.tree, C.forest,
+    C.path, C.circuit, C.clique, C.biclique, C.flower, C.node, C.tree, C.forest,
 
     -- * Graph folding
     foldg,
@@ -430,8 +430,7 @@ deBruijn :: Int -> [a] -> Fold [a]
 deBruijn len alphabet = bind skeleton expand
   where
     overlaps = mapM (const alphabet) [2..len]
-    skeleton = C.edges [ Left s | s <- overlaps ] `C.overlay`
-               C.edges [ Right s | s <- overlaps ]
+    skeleton = C.overlays [ C.into (C.edge (Left s)) (C.edge (Right s)) | s <- overlaps ]
     expand v = case v of
         Left  s -> foldr C.overlay C.empty [ C.edge ([a] ++ s) | a <- alphabet ]
         Right s -> foldr C.overlay C.empty [ C.edge (s ++ [a]) | a <- alphabet ]
