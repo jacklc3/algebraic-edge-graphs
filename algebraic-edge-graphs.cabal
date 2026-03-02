@@ -67,13 +67,16 @@ test-suite test
     hs-source-dirs:     test
     type:               exitcode-stdio-1.0
     main-is:            Main.hs
-    other-modules:      EdgeGraph.Test,
-                        EdgeGraph.Test.AdjacencyMap,
-                        EdgeGraph.Test.Arbitrary,
-                        EdgeGraph.Test.Fold,
-                        EdgeGraph.Test.EdgeGraph,
-                        EdgeGraph.Test.IntAdjacencyMap,
-                        EdgeGraph.Test.Incidence
+    other-modules:      Arbitrary,
+                        Testable.Graph,
+                        Testable.AlgebraicGraph,
+                        Testable.AdjacencyGraph,
+                        Testable.Instances,
+                        Test.AdjacencyMap,
+                        Test.Fold,
+                        Test.EdgeGraph,
+                        Test.IntAdjacencyMap,
+                        Test.Incidence
     build-depends:      algebraic-edge-graphs,
                         base       >= 4.9,
                         containers >= 0.5,

@@ -1,12 +1,13 @@
-import EdgeGraph.Test.AdjacencyMap
-import EdgeGraph.Test.Fold
-import EdgeGraph.Test.EdgeGraph
-import EdgeGraph.Test.IntAdjacencyMap
-import EdgeGraph.Test.Incidence
+import Test.AdjacencyMap
+import Test.Fold
+import Test.EdgeGraph
+import Test.IntAdjacencyMap
+import Test.Incidence
+
 main :: IO ()
 main = do
-    testAdjacencyMap
-    testFold
-    testGraph
-    testIntAdjacencyMap
-    testIncidence
+  testAdjacencyMap
+  testFold
+  testGraph
+  testIntAdjacencyMap
+  testIncidence
