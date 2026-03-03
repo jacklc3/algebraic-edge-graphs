@@ -2,9 +2,9 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module     : EdgeGraph.Class
--- Copyright  : (c) Andrey Mokhov 2016-2017
+-- Copyright  : (c) Jack Liell-Cock 2025-2026
 -- License    : MIT (see the file LICENSE)
--- Maintainer : andrey.mokhov@gmail.com
+-- Maintainer : jackliellcock@gmail.com
 -- Stability  : experimental
 --
 -- This module defines the core type class 'EdgeGraph', a few graph subclasses,
@@ -19,24 +19,24 @@
 -- core graph type class.
 -----------------------------------------------------------------------------
 module EdgeGraph.Class (
-    -- * The core type class
-    EdgeGraph (..),
+  -- * The core type class
+  EdgeGraph (..),
 
-    -- * Operators
-    (+++), (>+>), (<+>), (>+<),
+  -- * Operators
+  (+++), (>+>), (<+>), (>+<),
 
-    -- * Basic graph construction primitives
-    edges, overlays, intos, pitss, tipss,
+  -- * Basic graph construction primitives
+  edges, overlays, intos, pitss, tipss,
 
-    -- * Comparisons
-    isSubgraphOf,
+  -- * Comparisons
+  isSubgraphOf,
 
-    -- * Standard families of graphs
-    path, circuit, clique, biclique, flower, node, tree, forest,
+  -- * Standard families of graphs
+  path, circuit, clique, biclique, flower, node, tree, forest,
 
-    -- * Conversion between graph data types
-    ToEdgeGraph (..)
-  ) where
+  -- * Conversion between graph data types
+  ToEdgeGraph (..)
+) where
 
 import Data.Tree
 
@@ -113,20 +113,20 @@ nodes in the graph, and /s/ will denote the /size/ of the corresponding
 'EdgeGraph' expression.
 -}
 class EdgeGraph g where
-    -- | The type of graph edges.
-    type Edge g
-    -- | Construct the empty graph.
-    empty :: g
-    -- | Construct the graph with a single edge.
-    edge :: Edge g -> g
-    -- | Overlay two graphs.
-    overlay :: g -> g -> g
-    -- | Connect two graphs sequentially (pits of left to tips of right).
-    into :: g -> g -> g
-    -- | Connect two graphs at pits (where outgoing edges overlap).
-    pits :: g -> g -> g
-    -- | Connect two graphs at tips (where incoming edges overlap).
-    tips :: g -> g -> g
+  -- | The type of graph edges.
+  type Edge g
+  -- | Construct the empty graph.
+  empty :: g
+  -- | Construct the graph with a single edge.
+  edge :: Edge g -> g
+  -- | Overlay two graphs.
+  overlay :: g -> g -> g
+  -- | Connect two graphs sequentially (pits of left to tips of right).
+  into :: g -> g -> g
+  -- | Connect two graphs at pits (where outgoing edges overlap).
+  pits :: g -> g -> g
+  -- | Connect two graphs at tips (where incoming edges overlap).
+  tips :: g -> g -> g
 
 -- | Infix operator for 'overlay'.
 (+++) :: EdgeGraph g => g -> g -> g
@@ -149,52 +149,52 @@ infixl 7 <+>
 infixl 7 >+<
 
 instance EdgeGraph () where
-    type Edge () = ()
-    empty       = ()
-    edge  _     = ()
-    overlay _ _ = ()
-    into    _ _ = ()
-    pits    _ _ = ()
-    tips    _ _ = ()
+  type Edge () = ()
+  empty       = ()
+  edge  _     = ()
+  overlay _ _ = ()
+  into    _ _ = ()
+  pits    _ _ = ()
+  tips    _ _ = ()
 
 -- Note: Maybe g and (a -> g) instances are identical and use the Applicative's
 -- pure and <*>. We do not provide a general instance for all Applicative
 -- functors because that would lead to overlapping instances.
 instance EdgeGraph g => EdgeGraph (Maybe g) where
-    type Edge (Maybe g) = Edge g
-    empty       = pure empty
-    edge        = pure . edge
-    overlay x y = overlay <$> x <*> y
-    into    x y = into    <$> x <*> y
-    pits    x y = pits    <$> x <*> y
-    tips    x y = tips    <$> x <*> y
+  type Edge (Maybe g) = Edge g
+  empty       = pure empty
+  edge        = pure . edge
+  overlay x y = overlay <$> x <*> y
+  into    x y = into    <$> x <*> y
+  pits    x y = pits    <$> x <*> y
+  tips    x y = tips    <$> x <*> y
 
 instance EdgeGraph g => EdgeGraph (a -> g) where
-    type Edge (a -> g) = Edge g
-    empty       = pure empty
-    edge        = pure . edge
-    overlay x y = overlay <$> x <*> y
-    into    x y = into    <$> x <*> y
-    pits    x y = pits    <$> x <*> y
-    tips    x y = tips    <$> x <*> y
+  type Edge (a -> g) = Edge g
+  empty       = pure empty
+  edge        = pure . edge
+  overlay x y = overlay <$> x <*> y
+  into    x y = into    <$> x <*> y
+  pits    x y = pits    <$> x <*> y
+  tips    x y = tips    <$> x <*> y
 
 instance (EdgeGraph g, EdgeGraph h) => EdgeGraph (g, h) where
-    type Edge (g, h)          = (Edge g       , Edge h       )
-    empty                     = (empty        , empty        )
-    edge  (x,  y )            = (edge  x      , edge  y      )
-    overlay (x1, y1) (x2, y2) = (overlay x1 x2, overlay y1 y2)
-    into    (x1, y1) (x2, y2) = (into    x1 x2, into    y1 y2)
-    pits    (x1, y1) (x2, y2) = (pits    x1 x2, pits    y1 y2)
-    tips    (x1, y1) (x2, y2) = (tips    x1 x2, tips    y1 y2)
+  type Edge (g, h)          = (Edge g       , Edge h       )
+  empty                     = (empty        , empty        )
+  edge  (x,  y )            = (edge  x      , edge  y      )
+  overlay (x1, y1) (x2, y2) = (overlay x1 x2, overlay y1 y2)
+  into    (x1, y1) (x2, y2) = (into    x1 x2, into    y1 y2)
+  pits    (x1, y1) (x2, y2) = (pits    x1 x2, pits    y1 y2)
+  tips    (x1, y1) (x2, y2) = (tips    x1 x2, tips    y1 y2)
 
 instance (EdgeGraph g, EdgeGraph h, EdgeGraph i) => EdgeGraph (g, h, i) where
-    type Edge (g, h, i)               = (Edge g       , Edge h       , Edge i       )
-    empty                             = (empty        , empty        , empty        )
-    edge  (x,  y , z )                = (edge  x      , edge  y      , edge  z      )
-    overlay (x1, y1, z1) (x2, y2, z2) = (overlay x1 x2, overlay y1 y2, overlay z1 z2)
-    into    (x1, y1, z1) (x2, y2, z2) = (into    x1 x2, into    y1 y2, into    z1 z2)
-    pits    (x1, y1, z1) (x2, y2, z2) = (pits    x1 x2, pits    y1 y2, pits    z1 z2)
-    tips    (x1, y1, z1) (x2, y2, z2) = (tips    x1 x2, tips    y1 y2, tips    z1 z2)
+  type Edge (g, h, i)               = (Edge g       , Edge h       , Edge i       )
+  empty                             = (empty        , empty        , empty        )
+  edge  (x,  y , z )                = (edge  x      , edge  y      , edge  z      )
+  overlay (x1, y1, z1) (x2, y2, z2) = (overlay x1 x2, overlay y1 y2, overlay z1 z2)
+  into    (x1, y1, z1) (x2, y2, z2) = (into    x1 x2, into    y1 y2, into    z1 z2)
+  pits    (x1, y1, z1) (x2, y2, z2) = (pits    x1 x2, pits    y1 y2, pits    z1 z2)
+  tips    (x1, y1, z1) (x2, y2, z2) = (tips    x1 x2, tips    y1 y2, tips    z1 z2)
 
 -- | Construct the graph comprising a given list of isolated edges.
 -- Complexity: /O(L)/ time, memory and size, where /L/ is the length of the
@@ -364,5 +364,5 @@ forest = overlays . map tree
 -- acts as the identity on graph data structures, but allows to convert graphs
 -- between different data representations.
 class ToEdgeGraph t where
-    type ToEdge t
-    toEdgeGraph :: (EdgeGraph g, Edge g ~ ToEdge t) => t -> g
+  type ToEdge t
+  toEdgeGraph :: (EdgeGraph g, Edge g ~ ToEdge t) => t -> g

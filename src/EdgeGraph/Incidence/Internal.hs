@@ -1,9 +1,9 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module     : EdgeGraph.Incidence.Internal
--- Copyright  : (c) Andrey Mokhov 2016-2017
+-- Copyright  : (c) Jack Liell-Cock 2025-2026
 -- License    : MIT (see the file LICENSE)
--- Maintainer : andrey.mokhov@gmail.com
+-- Maintainer : jackliellcock@gmail.com
 -- Stability  : unstable
 --
 -- This module exposes the implementation of flow representations (the canonical
@@ -18,22 +18,22 @@
 --
 -----------------------------------------------------------------------------
 module EdgeGraph.Incidence.Internal (
-    -- * Data structure
-    Node (..), Incidence (..), consistent,
+  -- * Data structure
+  Node (..), Incidence (..), consistent,
 
-    -- * Normalization
-    normalize,
+  -- * Normalization
+  normalize,
 
-    -- * Basic graph construction primitives
-    empty, edge, overlay, into, pits, tips, edges, fromNodeList, fromIncidenceList,
+  -- * Basic graph construction primitives
+  empty, edge, overlay, into, pits, tips, edges, fromNodeList, fromIncidenceList,
 
-    -- * Graph properties
-    nodeList, nodeSet, edgeSet, edgeList,
-    edgeCount, nodeCount, isEmpty, hasEdge,
+  -- * Graph properties
+  nodeList, nodeSet, edgeSet, edgeList,
+  edgeCount, nodeCount, isEmpty, hasEdge,
 
-    -- * Graph transformation
-    removeEdge, detachPit, detachTip, gmap, induce
-  ) where
+  -- * Graph transformation
+  removeEdge, detachPit, detachTip, gmap, induce
+) where
 
 import Data.Set (Set, union)
 
@@ -47,14 +47,14 @@ import qualified Data.Set            as Set
 -- edges ('nodePits'). A node may have empty tips (making it a source
 -- node) or empty pits (making it a sink node), but not both empty.
 data Node a = Node {
-    -- | The set of incoming edges (tips) for this node.
-    nodeTips :: Set a,
-    -- | The set of outgoing edges (pits) for this node.
-    nodePits :: Set a
-  } deriving (Eq, Ord)
+  -- | The set of incoming edges (tips) for this node.
+  nodeTips :: Set a,
+  -- | The set of outgoing edges (pits) for this node.
+  nodePits :: Set a
+} deriving (Eq, Ord)
 
 instance (Ord a, Show a) => Show (Node a) where
-    show (Node ts ps) = "Node " ++ show (Set.toAscList ts) ++ " " ++ show (Set.toAscList ps)
+  show (Node ts ps) = "Node " ++ show (Set.toAscList ts) ++ " " ++ show (Set.toAscList ps)
 
 -- | The 'Incidence' data type represents an edge-indexed graph as a flow
 -- representation: a set of nodes where each edge appears in exactly one
@@ -63,49 +63,48 @@ instance (Ord a, Show a) => Show (Node a) where
 --
 -- The 'Eq' instance satisfies all axioms of algebraic edge graphs.
 newtype Incidence a = Incidence {
-    -- | The set of 'Node's in the flow representation.
-    nodes :: Set (Node a)
-  } deriving Eq
+  -- | The set of 'Node's in the flow representation.
+  nodes :: Set (Node a)
+} deriving Eq
 
 instance (Ord a, Show a) => Show (Incidence a) where
-    show (Incidence ns)
-        | Set.null ns = "empty"
-        | isSimpleEdge = "edge " ++ show singleLabel
-        | allIsolated  = "edges " ++ show isolatedLabels
-        | otherwise    = "fromNodeList " ++ show (Set.toAscList ns)
-      where
-        nl = Set.toAscList ns
-        -- Check for a single edge: exactly two nodes forming a source-sink pair
-        isSimpleEdge = Set.size ns == 2 &&
-            case nl of
-                [Node ts1 ps1, Node ts2 ps2] ->
-                    (Set.null ts1 && Set.size ps1 == 1 &&
-                     Set.size ts2 == 1 && Set.null ps2 &&
-                     ps1 == ts2)
-                    ||
-                    (Set.size ts1 == 1 && Set.null ps1 &&
-                     Set.null ts2 && Set.size ps2 == 1 &&
-                     ts1 == ps2)
-                _ -> False
-        singleLabel = case nl of
-            [Node ts ps, _] | Set.null ts -> Set.findMin ps
-            [_, Node ts ps] | Set.null ts -> Set.findMin ps
-            _ -> error "singleLabel: not a simple edge"
-        -- Check all nodes are isolated source-sink pairs
-        allIsolated = even (length nl) &&
-            all (\(Node ts ps) -> Set.null ts || Set.null ps) nl &&
-            all (\(Node ts ps) -> Set.size ts <= 1 && Set.size ps <= 1) nl &&
-            length nl > 0
-        isolatedLabels = [Set.findMin ps | Node ts ps <- nl, Set.null ts, Set.size ps == 1]
+  show (Incidence ns)
+      | Set.null ns = "empty"
+      | isSimpleEdge = "edge " ++ show singleLabel
+      | allIsolated  = "edges " ++ show isolatedLabels
+      | otherwise    = "fromNodeList " ++ show (Set.toAscList ns)
+    where
+      nl = Set.toAscList ns
+      -- Check for a single edge: exactly two nodes forming a source-sink pair
+      isSimpleEdge = Set.size ns == 2 &&
+        case nl of
+          [Node ts1 ps1, Node ts2 ps2] ->
+            (Set.null ts1 && Set.size ps1 == 1 &&
+             Set.size ts2 == 1 && Set.null ps2 &&
+             ps1 == ts2) ||
+            (Set.size ts1 == 1 && Set.null ps1 &&
+             Set.null ts2 && Set.size ps2 == 1 &&
+             ts1 == ps2)
+          _ -> False
+      singleLabel = case nl of
+        [Node ts ps, _] | Set.null ts -> Set.findMin ps
+        [_, Node ts ps] | Set.null ts -> Set.findMin ps
+        _ -> error "singleLabel: not a simple edge"
+      -- Check all nodes are isolated source-sink pairs
+      allIsolated = even (length nl) &&
+        all (\(Node ts ps) -> Set.null ts || Set.null ps) nl &&
+        all (\(Node ts ps) -> Set.size ts <= 1 && Set.size ps <= 1) nl &&
+        length nl > 0
+      isolatedLabels = [Set.findMin ps | Node ts ps <- nl, Set.null ts, Set.size ps == 1]
 
 instance Ord a => C.EdgeGraph (Incidence a) where
-    type Edge (Incidence a) = a
-    empty   = empty
-    edge    = edge
-    overlay = overlay
-    into    = into
-    pits    = pits
-    tips    = tips
+  type Edge (Incidence a) = a
+  empty   = empty
+  edge    = edge
+  overlay = overlay
+  into    = into
+  pits    = pits
+  tips    = tips
 
 -- | Check if a flow representation is consistent:
 --
@@ -181,10 +180,10 @@ ufFind uf x = case IntMap.lookup x uf of
 -- Makes the root of x point to the root of y.
 ufUnion :: IntMap.IntMap Int -> Int -> Int -> IntMap.IntMap Int
 ufUnion uf x y =
-    let rx = ufFind uf x
-        ry = ufFind uf y
-    in if rx == ry then uf
-       else IntMap.insert rx ry uf
+  let rx = ufFind uf x
+      ry = ufFind uf y
+  in if rx == ry then uf
+     else IntMap.insert rx ry uf
 
 -- | Construct the /empty graph/.
 -- Complexity: /O(1)/ time and memory.
@@ -201,16 +200,16 @@ empty = Incidence Set.empty
 -- Complexity: /O(1)/ time and memory.
 --
 -- @
--- 'isEmpty'        ('edge' x) == False
+-- 'isEmpty' ('edge' x)   == False
 -- 'hasEdge' x ('edge' x) == True
 -- 'edgeCount' ('edge' x) == 1
--- 'nodeCount'      ('edge' x) == 2
+-- 'nodeCount' ('edge' x) == 2
 -- @
 edge :: Ord a => a -> Incidence a
 edge a = Incidence $ Set.fromList
-    [ Node Set.empty        (Set.singleton a)  -- source: edge a leaves
-    , Node (Set.singleton a) Set.empty         -- sink:   edge a arrives
-    ]
+  [ Node Set.empty        (Set.singleton a)  -- source: edge a leaves
+  , Node (Set.singleton a) Set.empty         -- sink:   edge a arrives
+  ]
 
 -- | /Overlay/ two graphs. This computes the least upper bound of two flow
 -- representations by merging nodes that share edges.
@@ -226,17 +225,17 @@ edge a = Incidence $ Set.fromList
 -- @
 overlay :: Ord a => Incidence a -> Incidence a -> Incidence a
 overlay (Incidence xs) (Incidence ys) =
-    Incidence $ normalize (Set.toList xs ++ Set.toList ys)
+  Incidence $ normalize (Set.toList xs ++ Set.toList ys)
 
 -- | Helper function c_i from Definition 10 of the paper.
 -- Creates the intermediate nodes for the 'into' operation.
 ci :: Ord a => a -> a -> [Node a]
 ci d e
-    | d /= e    = [ Node Set.empty        (Set.singleton d)
-                   , Node (Set.singleton d) (Set.singleton e)
-                   , Node (Set.singleton e) Set.empty
-                   ]
-    | otherwise  = [ Node (Set.singleton d) (Set.singleton d) ]
+  | d /= e     = [ Node Set.empty         (Set.singleton d)
+                 , Node (Set.singleton d) (Set.singleton e)
+                 , Node (Set.singleton e)  Set.empty
+                 ]
+  | otherwise  = [ Node (Set.singleton d) (Set.singleton d) ]
 
 -- | /Into/ two graphs. Connects the sink side of the left graph to the
 -- source side of the right graph, creating a sequential composition.
@@ -355,7 +354,7 @@ isEmpty = Set.null . nodes
 -- average number of labels per node.
 edgeSet :: Ord a => Incidence a -> Set a
 edgeSet (Incidence ns) = Set.unions
-    [ nodeTips n `union` nodePits n | n <- Set.toList ns ]
+  [ nodeTips n `union` nodePits n | n <- Set.toList ns ]
 
 -- | The sorted list of all distinct edges.
 edgeList :: Ord a => Incidence a -> [a]
@@ -378,11 +377,11 @@ hasEdge a = Set.member a . edgeSet
 -- @
 removeEdge :: Ord a => a -> Incidence a -> Incidence a
 removeEdge x (Incidence ns) = Incidence $ Set.fromList
-    [ n'
-    | n <- Set.toList ns
-    , let n' = Node (Set.delete x (nodeTips n)) (Set.delete x (nodePits n))
-    , not (Set.null (nodeTips n') && Set.null (nodePits n'))
-    ]
+  [ n'
+  | n <- Set.toList ns
+  , let n' = Node (Set.delete x (nodeTips n)) (Set.delete x (nodePits n))
+  , not (Set.null (nodeTips n') && Set.null (nodePits n'))
+  ]
 
 -- | Detach an edge from its source node. The edge gets a fresh source
 -- node @Node ∅ {a}@ while any other edges sharing the original source node
@@ -397,18 +396,18 @@ removeEdge x (Incidence ns) = Incidence $ Set.fromList
 -- @
 detachPit :: Ord a => a -> Incidence a -> Incidence a
 detachPit a r@(Incidence ns)
-    | not (hasEdge a r) = r
-    | otherwise = Incidence $ Set.insert freshSource stripped
+  | not (hasEdge a r) = r
+  | otherwise = Incidence $ Set.insert freshSource stripped
   where
     freshSource = Node Set.empty (Set.singleton a)
     stripped = Set.fromList
-        [ n'
-        | n <- Set.toList ns
-        , let n' = if Set.member a (nodePits n)
-                   then Node (nodeTips n) (Set.delete a (nodePits n))
-                   else n
-        , not (Set.null (nodeTips n') && Set.null (nodePits n'))
-        ]
+      [ n'
+      | n <- Set.toList ns
+      , let n' = if Set.member a (nodePits n)
+                 then Node (nodeTips n) (Set.delete a (nodePits n))
+                 else n
+      , not (Set.null (nodeTips n') && Set.null (nodePits n'))
+      ]
 
 -- | Detach an edge from its sink node. The edge gets a fresh sink
 -- node @Node {a} ∅@ while any other edges sharing the original sink node
@@ -423,18 +422,18 @@ detachPit a r@(Incidence ns)
 -- @
 detachTip :: Ord a => a -> Incidence a -> Incidence a
 detachTip a r@(Incidence ns)
-    | not (hasEdge a r) = r
-    | otherwise = Incidence $ Set.insert freshSink stripped
+  | not (hasEdge a r) = r
+  | otherwise = Incidence $ Set.insert freshSink stripped
   where
     freshSink = Node (Set.singleton a) Set.empty
     stripped = Set.fromList
-        [ n'
-        | n <- Set.toList ns
-        , let n' = if Set.member a (nodeTips n)
-                   then Node (Set.delete a (nodeTips n)) (nodePits n)
-                   else n
-        , not (Set.null (nodeTips n') && Set.null (nodePits n'))
-        ]
+      [ n'
+      | n <- Set.toList ns
+      , let n' = if Set.member a (nodeTips n)
+                 then Node (Set.delete a (nodeTips n)) (nodePits n)
+                 else n
+      , not (Set.null (nodeTips n') && Set.null (nodePits n'))
+      ]
 
 -- | Transform a graph by applying a function to each edge. The result
 -- is normalized since the function may map different labels to the same value,
@@ -444,8 +443,8 @@ detachTip a r@(Incidence ns)
 -- @
 -- gmap f 'empty'    == 'empty'
 -- gmap f ('edge' x) == 'edge' (f x)
--- gmap id         == id
--- gmap f . gmap g == gmap (f . g)
+-- gmap id           == id
+-- gmap f . gmap g   == gmap (f . g)
 -- @
 gmap :: (Ord a, Ord b) => (a -> b) -> Incidence a -> Incidence b
 gmap f (Incidence ns) = Incidence $ normalize $ map mapNode $ Set.toList ns
@@ -462,9 +461,8 @@ gmap f (Incidence ns) = Incidence $ normalize $ map mapNode $ Set.toList ns
 -- @
 induce :: Ord a => (a -> Bool) -> Incidence a -> Incidence a
 induce p (Incidence ns) = Incidence $ Set.fromList
-    [ n'
-    | n <- Set.toList ns
-    , let n' = Node (Set.filter p (nodeTips n)) (Set.filter p (nodePits n))
-    , not (Set.null (nodeTips n') && Set.null (nodePits n'))
-    ]
-
+  [ n'
+  | n <- Set.toList ns
+  , let n' = Node (Set.filter p (nodeTips n)) (Set.filter p (nodePits n))
+  , not (Set.null (nodeTips n') && Set.null (nodePits n'))
+  ]

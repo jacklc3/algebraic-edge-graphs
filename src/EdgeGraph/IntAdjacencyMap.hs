@@ -1,9 +1,9 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module     : EdgeGraph.IntAdjacencyMap
--- Copyright  : (c) Andrey Mokhov 2016-2017
+-- Copyright  : (c) Jack Liell-Cock 2025-2026
 -- License    : MIT (see the file LICENSE)
--- Maintainer : andrey.mokhov@gmail.com
+-- Maintainer : jackliellcock@gmail.com
 -- Stability  : experimental
 --
 -- This module defines the 'IntAdjacencyMap' data type for edge-indexed graphs
@@ -13,35 +13,35 @@
 -- non-@Int@ edges.
 -----------------------------------------------------------------------------
 module EdgeGraph.IntAdjacencyMap (
-    -- * Data structure
-    IntAdjacencyMap, Adjacency (..),
+  -- * Data structure
+  IntAdjacencyMap, Adjacency (..),
 
-    -- * Conversion
-    toIncidence, fromIncidence,
+  -- * Conversion
+  toIncidence, fromIncidence,
 
-    -- * Basic graph construction primitives
-    empty, edge, overlay, into, pits, tips, edges, fromNodeList, fromIncidenceList,
-    overlays, intos,
+  -- * Basic graph construction primitives
+  empty, edge, overlay, into, pits, tips, edges, fromNodeList, fromIncidenceList,
+  overlays, intos,
 
-    -- * Comparisons
-    isSubgraphOf,
+  -- * Comparisons
+  isSubgraphOf,
 
-    -- * Graph properties
-    isEmpty, hasEdge, edgeCount, nodeCount,
-    edgeList, adjacencyList, nodeList, edgeIntSet, nodeSet,
+  -- * Graph properties
+  isEmpty, hasEdge, edgeCount, nodeCount,
+  edgeList, adjacencyList, nodeList, edgeIntSet, nodeSet,
 
-    -- * Graph queries
-    postset, preset,
+  -- * Graph queries
+  postset, preset,
 
-    -- * Standard families of graphs
-    path, circuit, clique, biclique, flower, node, tree, forest,
+  -- * Standard families of graphs
+  path, circuit, clique, biclique, flower, node, tree, forest,
 
-    -- * Graph transformation
-    replaceEdge, mergeEdges, detachPit, detachTip, gmap, induce,
+  -- * Graph transformation
+  replaceEdge, mergeEdges, detachPit, detachTip, gmap, induce,
 
-    -- * Graph algorithms
-    dfsForest, topSort, isTopSort
-  ) where
+  -- * Graph algorithms
+  dfsForest, topSort, isTopSort
+) where
 
 import Data.Set (Set)
 import Data.Tree
@@ -95,8 +95,8 @@ mergeEdges p v = gmap $ \u -> if p u then v else u
 -- | The /postset/ (set of successors) of an edge in the graph.
 --
 -- @
--- postset x 'empty'                      == Set.'Set.empty'
--- postset x ('edge' x)                   == Set.'Set.empty'
+-- postset x 'empty'                        == Set.'Set.empty'
+-- postset x ('edge' x)                     == Set.'Set.empty'
 -- postset 1 ('into' ('edge' 1) ('edge' 2)) == Set.'Set.singleton' 2
 -- @
 postset :: Int -> IntAdjacencyMap -> Set Int
@@ -105,8 +105,8 @@ postset a (IntAdjacencyMap m) = maybe Set.empty succs (Map.lookup a m)
 -- | The /preset/ (set of predecessors) of an edge in the graph.
 --
 -- @
--- preset x 'empty'                      == Set.'Set.empty'
--- preset x ('edge' x)                   == Set.'Set.empty'
+-- preset x 'empty'                        == Set.'Set.empty'
+-- preset x ('edge' x)                     == Set.'Set.empty'
 -- preset 2 ('into' ('edge' 1) ('edge' 2)) == Set.'Set.singleton' 1
 -- @
 preset :: Int -> IntAdjacencyMap -> Set Int
@@ -122,10 +122,10 @@ graphKL (IntAdjacencyMap m) = (g, \u -> case r u of (_, v, _) -> v)
 -- | Compute the /depth-first search/ forest of a graph.
 --
 -- @
--- 'dfsForest' 'empty'                          == []
--- 'dfsForest' ('edge' x)                       == [Node x []]
+-- 'dfsForest' 'empty'                         == []
+-- 'dfsForest' ('edge' x)                      == [Node x []]
 -- 'isSubgraphOf' ('forest' $ 'dfsForest' x) x == True
--- 'dfsForest' . 'forest' . 'dfsForest'         == 'dfsForest'
+-- 'dfsForest' . 'forest' . 'dfsForest'        == 'dfsForest'
 -- @
 dfsForest :: IntAdjacencyMap -> Forest Int
 dfsForest m = let (g, r) = graphKL m in fmap (fmap r) (KL.dff g)

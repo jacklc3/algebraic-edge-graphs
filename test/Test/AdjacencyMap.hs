@@ -7,12 +7,11 @@ import Testable.Graph
 import Testable.AdjacencyGraph
 import Testable.Instances ()
 import Arbitrary ()
-import EdgeGraph.AdjacencyMap.Internal (AdjacencyMap)
 import qualified EdgeGraph.AdjacencyMap as AM
 
 import qualified Data.Set as Set
 
-type AI = AdjacencyMap Int
+type AI = AM.AdjacencyMap Int
 
 testAdjacencyMap :: IO ()
 testAdjacencyMap = do

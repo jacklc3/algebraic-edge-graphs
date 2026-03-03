@@ -1,9 +1,9 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module     : EdgeGraph.IntAdjacencyMap.Internal
--- Copyright  : (c) Andrey Mokhov 2016-2017
+-- Copyright  : (c) Jack Liell-Cock 2025-2026
 -- License    : MIT (see the file LICENSE)
--- Maintainer : andrey.mokhov@gmail.com
+-- Maintainer : jackliellcock@gmail.com
 -- Stability  : unstable
 --
 -- This module exposes the implementation of Int-specialised edge-indexed
@@ -12,22 +12,22 @@
 --
 -----------------------------------------------------------------------------
 module EdgeGraph.IntAdjacencyMap.Internal (
-    -- * Data structure
-    Adjacency (..), IntAdjacencyMap (..), consistent,
+  -- * Data structure
+  Adjacency (..), IntAdjacencyMap (..), consistent,
 
-    -- * Conversion
-    toIncidence, fromIncidence,
+  -- * Conversion
+  toIncidence, fromIncidence,
 
-    -- * Basic graph construction primitives
-    empty, edge, overlay, into, pits, tips, edges, fromNodeList, fromIncidenceList,
+  -- * Basic graph construction primitives
+  empty, edge, overlay, into, pits, tips, edges, fromNodeList, fromIncidenceList,
 
-    -- * Graph properties
-    nodeList, nodeSet, edgeList, adjacencyList, edgeIntSet,
-    edgeCount, nodeCount, isEmpty, hasEdge,
+  -- * Graph properties
+  nodeList, nodeSet, edgeList, adjacencyList, edgeIntSet,
+  edgeCount, nodeCount, isEmpty, hasEdge,
 
-    -- * Graph transformation
-    removeEdge, detachPit, detachTip, gmap, induce
-  ) where
+  -- * Graph transformation
+  removeEdge, detachPit, detachTip, gmap, induce
+) where
 
 import Data.IntSet (IntSet)
 import Data.Map.Strict (Map)
@@ -42,28 +42,28 @@ import qualified EdgeGraph.Incidence.Internal as I
 -- | Neighbourhood information for a single Int edge.
 -- See "EdgeGraph.AdjacencyMap.Internal" for the general version.
 data Adjacency = Adjacency
-    { forks :: Set Int
-    , joins :: Set Int
-    , preds :: Set Int
-    , succs :: Set Int
-    } deriving (Eq, Ord, Show)
+  { forks :: Set Int
+  , joins :: Set Int
+  , preds :: Set Int
+  , succs :: Set Int
+  } deriving (Eq, Ord, Show)
 
 -- | Int-specialized edge-indexed adjacency map.
 newtype IntAdjacencyMap = IntAdjacencyMap
-    { adjacencyIntMap :: Map Int Adjacency
-    } deriving Eq
+  { adjacencyIntMap :: Map Int Adjacency
+  } deriving Eq
 
 instance Show IntAdjacencyMap where
-    show = show . toIncidence
+  show = show . toIncidence
 
 instance C.EdgeGraph IntAdjacencyMap where
-    type Edge IntAdjacencyMap = Int
-    empty   = empty
-    edge    = edge
-    overlay = overlay
-    into    = into
-    pits    = pits
-    tips    = tips
+  type Edge IntAdjacencyMap = Int
+  empty   = empty
+  edge    = edge
+  overlay = overlay
+  into    = into
+  pits    = pits
+  tips    = tips
 
 -- | Convert an 'IntAdjacencyMap' to its equivalent 'I.Incidence' representation.
 toIncidence :: IntAdjacencyMap -> I.Incidence Int
@@ -73,9 +73,9 @@ toIncidence (IntAdjacencyMap m)
   where
     allNodes = concatMap nodesPair (Map.elems m)
     nodesPair adj =
-        [ I.Node (preds adj) (forks adj)
-        , I.Node (joins adj) (succs adj)
-        ]
+      [ I.Node (preds adj) (forks adj)
+      , I.Node (joins adj) (succs adj)
+      ]
 
 -- | Convert an 'I.Incidence' to an 'IntAdjacencyMap'.
 fromIncidence :: I.Incidence Int -> IntAdjacencyMap
@@ -85,19 +85,19 @@ fromIncidence (I.Incidence ns)
   where
     nl = Set.toList ns
     sourceMap = Map.fromList
-        [ (a, n) | n <- nl, a <- Set.toList (I.nodePits n) ]
+      [ (a, n) | n <- nl, a <- Set.toList (I.nodePits n) ]
     sinkMap = Map.fromList
-        [ (a, n) | n <- nl, a <- Set.toList (I.nodeTips n) ]
+      [ (a, n) | n <- nl, a <- Set.toList (I.nodeTips n) ]
     allEdges = Map.keysSet sourceMap
     buildAdj a =
-        let srcNode  = sourceMap Map.! a
-            sinkNode = sinkMap   Map.! a
-        in Adjacency
-            { forks = I.nodePits srcNode
-            , joins = I.nodeTips sinkNode
-            , preds = I.nodeTips srcNode
-            , succs = I.nodePits sinkNode
-            }
+      let srcNode  = sourceMap Map.! a
+          sinkNode = sinkMap   Map.! a
+      in Adjacency
+        { forks = I.nodePits srcNode
+        , joins = I.nodeTips sinkNode
+        , preds = I.nodeTips srcNode
+        , succs = I.nodePits sinkNode
+        }
 
 -- | Check consistency of an 'IntAdjacencyMap'.
 consistent :: IntAdjacencyMap -> Bool
@@ -109,50 +109,50 @@ consistent (IntAdjacencyMap m) =
     entries = Map.toList m
 
     selfMembership = all (\(a, adj) ->
-        Set.member a (forks adj) && Set.member a (joins adj)) entries
+      Set.member a (forks adj) && Set.member a (joins adj)) entries
 
     forkEquiv = all (\(_, adj) ->
-        all (\b -> case Map.lookup b m of
-            Just adjB -> forks adjB == forks adj
-            Nothing   -> False
-        ) (Set.toList $ forks adj)) entries
+      all (\b -> case Map.lookup b m of
+        Just adjB -> forks adjB == forks adj
+        Nothing   -> False
+      ) (Set.toList $ forks adj)) entries
 
     joinEquiv = all (\(_, adj) ->
-        all (\b -> case Map.lookup b m of
-            Just adjB -> joins adjB == joins adj
-            Nothing   -> False
-        ) (Set.toList $ joins adj)) entries
+      all (\b -> case Map.lookup b m of
+        Just adjB -> joins adjB == joins adj
+        Nothing   -> False
+      ) (Set.toList $ joins adj)) entries
 
     predCross = all (\(_, adj) ->
-        all (\b -> case Map.lookup b m of
-            Just adjB -> succs adjB == forks adj
-                      && joins adjB == preds adj
-            Nothing   -> False
-        ) (Set.toList $ preds adj)) entries
+      all (\b -> case Map.lookup b m of
+        Just adjB -> succs adjB == forks adj
+                  && joins adjB == preds adj
+        Nothing   -> False
+      ) (Set.toList $ preds adj)) entries
 
     succCross = all (\(_, adj) ->
-        all (\b -> case Map.lookup b m of
-            Just adjB -> preds adjB == joins adj
-                      && forks adjB == succs adj
-            Nothing   -> False
-        ) (Set.toList $ succs adj)) entries
+      all (\b -> case Map.lookup b m of
+        Just adjB -> preds adjB == joins adj
+                  && forks adjB == succs adj
+        Nothing   -> False
+      ) (Set.toList $ succs adj)) entries
 
     allExist = all (\(_, adj) ->
-        Set.isSubsetOf (forks adj) keys &&
-        Set.isSubsetOf (joins adj) keys &&
-        Set.isSubsetOf (preds adj) keys &&
-        Set.isSubsetOf (succs adj) keys) entries
+      Set.isSubsetOf (forks adj) keys &&
+      Set.isSubsetOf (joins adj) keys &&
+      Set.isSubsetOf (preds adj) keys &&
+      Set.isSubsetOf (succs adj) keys) entries
 
 empty :: IntAdjacencyMap
 empty = IntAdjacencyMap Map.empty
 
 edge :: Int -> IntAdjacencyMap
 edge a = IntAdjacencyMap $ Map.singleton a $ Adjacency
-    { forks = Set.singleton a
-    , joins = Set.singleton a
-    , preds = Set.empty
-    , succs = Set.empty
-    }
+  { forks = Set.singleton a
+  , joins = Set.singleton a
+  , preds = Set.empty
+  , succs = Set.empty
+  }
 
 overlay :: IntAdjacencyMap -> IntAdjacencyMap -> IntAdjacencyMap
 overlay x y = fromIncidence $ I.overlay (toIncidence x) (toIncidence y)
@@ -178,7 +178,7 @@ fromNodeList = fromIncidence . I.fromNodeList
 -- are merged).
 --
 -- @
--- fromIncidenceList []                == 'empty'
+-- fromIncidenceList []                  == 'empty'
 -- fromIncidenceList [([],[x]),([x],[])] == 'edge' x
 -- @
 fromIncidenceList :: [([Int], [Int])] -> IntAdjacencyMap
@@ -207,7 +207,7 @@ edgeIntSet (IntAdjacencyMap m) = IntSet.fromDistinctAscList (Map.keys m)
 -- Complexity: /O(n)/ time and memory.
 --
 -- @
--- adjacencyList 'empty'    == []
+-- adjacencyList 'empty' == []
 -- @
 adjacencyList :: IntAdjacencyMap -> [(Int, Adjacency)]
 adjacencyList (IntAdjacencyMap m) = Map.toAscList m
@@ -284,8 +284,8 @@ induce p (IntAdjacencyMap m) = IntAdjacencyMap $ Map.map updateAdj kept
     kept     = Map.filterWithKey (\k _ -> p k) m
     keptKeys = Map.keysSet kept
     updateAdj adj = Adjacency
-        { forks = Set.intersection (forks adj) keptKeys
-        , joins = Set.intersection (joins adj) keptKeys
-        , preds = Set.intersection (preds adj) keptKeys
-        , succs = Set.intersection (succs adj) keptKeys
-        }
+      { forks = Set.intersection (forks adj) keptKeys
+      , joins = Set.intersection (joins adj) keptKeys
+      , preds = Set.intersection (preds adj) keptKeys
+      , succs = Set.intersection (succs adj) keptKeys
+      }

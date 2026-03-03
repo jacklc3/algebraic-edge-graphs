@@ -1,9 +1,9 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module     : EdgeGraph.Incidence
--- Copyright  : (c) Andrey Mokhov 2016-2017
+-- Copyright  : (c) Jack Liell-Cock 2025-2026
 -- License    : MIT (see the file LICENSE)
--- Maintainer : andrey.mokhov@gmail.com
+-- Maintainer : jackliellcock@gmail.com
 -- Stability  : experimental
 --
 -- This module defines the 'Incidence' data type for algebraic edge graphs,
@@ -14,28 +14,28 @@
 -- See "EdgeGraph.Incidence.Internal" for the underlying implementation.
 -----------------------------------------------------------------------------
 module EdgeGraph.Incidence (
-    -- * Data structure
-    Incidence, Node, nodes,
+  -- * Data structure
+  Incidence, Node, nodes,
 
-    -- * Basic graph construction primitives
-    empty, edge, overlay, into, pits, tips, edges, fromNodeList, fromIncidenceList,
+  -- * Basic graph construction primitives
+  empty, edge, overlay, into, pits, tips, edges, fromNodeList, fromIncidenceList,
 
-    -- * Comparisons
-    isSubgraphOf,
+  -- * Comparisons
+  isSubgraphOf,
 
-    -- * Graph properties
-    isEmpty, hasEdge, edgeCount, nodeCount,
-    edgeList, nodeList, edgeSet, nodeSet, edgeIntSet,
+  -- * Graph properties
+  isEmpty, hasEdge, edgeCount, nodeCount,
+  edgeList, nodeList, edgeSet, nodeSet, edgeIntSet,
 
-    -- * Standard families of graphs
-    path, circuit, clique, biclique, flower, node, tree, forest,
+  -- * Standard families of graphs
+  path, circuit, clique, biclique, flower, node, tree, forest,
 
-    -- * Graph transformation
-    replaceEdge, mergeEdges, detachPit, detachTip, gmap, induce,
+  -- * Graph transformation
+  replaceEdge, mergeEdges, detachPit, detachTip, gmap, induce,
 
-    -- * Graph construction from lists
-    overlays, intos
-  ) where
+  -- * Graph construction from lists
+  overlays, intos
+) where
 
 import EdgeGraph.Incidence.Internal
 
@@ -48,9 +48,9 @@ import qualified Data.Tree           as Tree
 -- Complexity: /O(n^2 * m)/ time.
 --
 -- @
--- isSubgraphOf 'empty'         x             == True
--- isSubgraphOf ('edge' x)      'empty'         == False
--- isSubgraphOf x             ('overlay' x y) == True
+-- isSubgraphOf 'empty' x          == True
+-- isSubgraphOf ('edge' x) 'empty' == False
+-- isSubgraphOf x ('overlay' x y)  == True
 -- @
 isSubgraphOf :: Ord a => Incidence a -> Incidence a -> Bool
 isSubgraphOf x y = overlay x y == y
@@ -137,10 +137,10 @@ flower = C.flower
 -- length of the given lists.
 --
 -- @
--- node []  []    == 'empty'
--- node [x] []    == 'edge' x
--- node []  [y]   == 'edge' y
--- node [x] [y]   == 'into' ('edge' x) ('edge' y)
+-- node []  []  == 'empty'
+-- node [x] []  == 'edge' x
+-- node []  [y] == 'edge' y
+-- node [x] [y] == 'into' ('edge' x) ('edge' y)
 -- @
 node :: Ord a => [a] -> [a] -> Incidence a
 node = C.node
@@ -164,7 +164,7 @@ forest = C.forest
 --
 -- @
 -- replaceEdge x x            == id
--- replaceEdge x y ('edge' x)   == 'edge' y
+-- replaceEdge x y ('edge' x) == 'edge' y
 -- replaceEdge x y            == 'mergeEdges' (== x) y
 -- @
 replaceEdge :: Ord a => a -> a -> Incidence a -> Incidence a
@@ -186,8 +186,8 @@ mergeEdges p v = gmap (\u -> if p u then v else u)
 -- Complexity: /O(n * m)/ time.
 --
 -- @
--- edgeIntSet 'empty'      == IntSet.'IntSet.empty'
--- edgeIntSet ('edge' x)   == IntSet.'IntSet.singleton' x
+-- edgeIntSet 'empty'    == IntSet.'IntSet.empty'
+-- edgeIntSet ('edge' x) == IntSet.'IntSet.singleton' x
 -- @
 edgeIntSet :: Incidence Int -> IntSet.IntSet
 edgeIntSet = IntSet.fromAscList . edgeList

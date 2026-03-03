@@ -6,7 +6,7 @@ import Testable.Graph
 import Testable.AdjacencyGraph
 import Testable.Instances ()
 import Arbitrary ()
-import EdgeGraph.IntAdjacencyMap.Internal (IntAdjacencyMap)
+import EdgeGraph.IntAdjacencyMap (IntAdjacencyMap)
 
 testIntAdjacencyMap :: IO ()
 testIntAdjacencyMap = do

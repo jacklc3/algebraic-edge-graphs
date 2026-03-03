@@ -2,6 +2,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module     : EdgeGraph
+-- Copyright  : (c) Jack Liell-Cock 2025-2026
 -- License    : MIT (see the file LICENSE)
 -- Maintainer : jackliellcock@gmail.com
 -- Stability  : experimental

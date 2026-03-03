@@ -1,9 +1,9 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module     : EdgeGraph.AdjacencyMap
--- Copyright  : (c) Andrey Mokhov 2016-2017
+-- Copyright  : (c) Jack Liell-Cock 2025-2026
 -- License    : MIT (see the file LICENSE)
--- Maintainer : andrey.mokhov@gmail.com
+-- Maintainer : jackliellcock@gmail.com
 -- Stability  : experimental
 --
 -- This module defines the 'AdjacencyMap' data type as an edge-indexed
@@ -122,8 +122,8 @@ edgeIntSet = IntSet.fromDistinctAscList . Map.keys . adjacencyMap
 -- i.e. the edges that the given edge flows into.
 --
 -- @
--- postset x 'empty'                      == Set.'Set.empty'
--- postset x ('edge' x)                   == Set.'Set.empty'
+-- postset x 'empty'                        == Set.'Set.empty'
+-- postset x ('edge' x)                     == Set.'Set.empty'
 -- postset 1 ('into' ('edge' 1) ('edge' 2)) == Set.'Set.singleton' 2
 -- @
 postset :: Ord a => a -> AdjacencyMap a -> Set a
@@ -134,8 +134,8 @@ postset a (AdjacencyMap m) = maybe Set.empty succs (Map.lookup a m)
 -- i.e. the edges that flow into the given edge.
 --
 -- @
--- preset x 'empty'                      == Set.'Set.empty'
--- preset x ('edge' x)                   == Set.'Set.empty'
+-- preset x 'empty'                        == Set.'Set.empty'
+-- preset x ('edge' x)                     == Set.'Set.empty'
 -- preset 2 ('into' ('edge' 1) ('edge' 2)) == Set.'Set.singleton' 1
 -- @
 preset :: Ord a => a -> AdjacencyMap a -> Set a
@@ -153,10 +153,10 @@ graphKL (AdjacencyMap m) = (g, \u -> case r u of (_, v, _) -> v)
 -- directed flow from each edge to its successors.
 --
 -- @
--- 'dfsForest' 'empty'                          == []
--- 'dfsForest' ('edge' x)                       == [Node x []]
+-- 'dfsForest' 'empty'                         == []
+-- 'dfsForest' ('edge' x)                      == [Node x []]
 -- 'isSubgraphOf' ('forest' $ 'dfsForest' x) x == True
--- 'dfsForest' . 'forest' . 'dfsForest'         == 'dfsForest'
+-- 'dfsForest' . 'forest' . 'dfsForest'        == 'dfsForest'
 -- @
 dfsForest :: Ord a => AdjacencyMap a -> Forest a
 dfsForest m = let (g, r) = graphKL m in fmap (fmap r) (KL.dff g)
@@ -182,9 +182,9 @@ topSort m = if isTopSort result m then Just result else Nothing
 -- and no edge appears after one of its successors.
 --
 -- @
--- 'isTopSort' [] 'empty'      == True
--- 'isTopSort' [x] ('edge' x)  == True
--- 'isTopSort' [] ('edge' x)   == False
+-- 'isTopSort' [] 'empty'     == True
+-- 'isTopSort' [x] ('edge' x) == True
+-- 'isTopSort' [] ('edge' x)  == False
 -- @
 isTopSort :: Ord a => [a] -> AdjacencyMap a -> Bool
 isTopSort xs m = go Set.empty xs
@@ -198,10 +198,10 @@ isTopSort xs m = go Set.empty xs
 -- Edges that form directed cycles are grouped into the same component.
 --
 -- @
--- 'scc' 'empty'                                   == 'empty'
--- 'scc' ('edge' x)                                == 'edge' (Set.'Set.singleton' x)
--- 'scc' ('circuit' (1:xs))                        == 'edge' (Set.'Set.fromList' (1:xs))
--- 'edgeCount' ('scc' x) >= 'edgeCount' x  == False
+-- 'scc' 'empty'                          == 'empty'
+-- 'scc' ('edge' x)                       == 'edge' (Set.'Set.singleton' x)
+-- 'scc' ('circuit' (1:xs))               == 'edge' (Set.'Set.fromList' (1:xs))
+-- 'edgeCount' ('scc' x) >= 'edgeCount' x == False
 -- @
 scc :: Ord a => AdjacencyMap a -> AdjacencyMap (Set a)
 scc m = gmap (\v -> Map.findWithDefault Set.empty v components) m

@@ -19,10 +19,10 @@ testIncidence = do
 
   -- Type-specific: Show
   putStrLn "\n============ Show ============"
-  test "show (empty     :: Incidence Int) == \"empty\"" $
-        show (empty     :: FI) == "empty"
-  test "show (edge 1    :: Incidence Int) == \"edge 1\"" $
-        show (edge 1    :: FI) == "edge 1"
+  test "show (empty  :: Incidence Int) == \"empty\"" $
+        show (empty  :: FI) == "empty"
+  test "show (edge 1 :: Incidence Int) == \"edge 1\"" $
+        show (edge 1 :: FI) == "edge 1"
   test "show (overlay (edge 1) (edge 2) :: Incidence Int) == \"edges [1,2]\"" $
         show (overlay (edge 1) (edge 2) :: FI) == "edges [1,2]"
 

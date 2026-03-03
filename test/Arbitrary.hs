@@ -22,34 +22,34 @@ arbitraryGraph = sized expr
     expr 0 = return C.empty
     expr 1 = C.edge <$> arbitrary
     expr n = do
-        left <- choose (0, n)
-        oneof [ C.overlay <$> (expr left) <*> (expr $ n - left)
-              , C.into    <$> (expr left) <*> (expr $ n - left)
-              , C.pits    <$> (expr left) <*> (expr $ n - left)
-              , C.tips    <$> (expr left) <*> (expr $ n - left) ]
+      left <- choose (0, n)
+      oneof [ C.overlay <$> (expr left) <*> (expr $ n - left)
+            , C.into    <$> (expr left) <*> (expr $ n - left)
+            , C.pits    <$> (expr left) <*> (expr $ n - left)
+            , C.tips    <$> (expr left) <*> (expr $ n - left) ]
 
 instance Arbitrary a => Arbitrary (EdgeGraph a) where
-    arbitrary = arbitraryGraph
+  arbitrary = arbitraryGraph
 
-    shrink Empty       = []
-    shrink (Edge _)    = [Empty]
-    shrink (x :++: y)  = [Empty, x, y]
-                       ++ [x' :++: y' | (x', y') <- shrink (x, y) ]
-    shrink (x :>>: y)  = [Empty, x, y, x :++: y]
-                       ++ [x' :>>: y' | (x', y') <- shrink (x, y) ]
-    shrink (x :<>: y)  = [Empty, x, y, x :++: y]
-                       ++ [x' :<>: y' | (x', y') <- shrink (x, y) ]
-    shrink (x :><: y)  = [Empty, x, y, x :++: y]
-                       ++ [x' :><: y' | (x', y') <- shrink (x, y) ]
+  shrink Empty       = []
+  shrink (Edge _)    = [Empty]
+  shrink (x :++: y)  = [Empty, x, y]
+                     ++ [x' :++: y' | (x', y') <- shrink (x, y) ]
+  shrink (x :>>: y)  = [Empty, x, y, x :++: y]
+                     ++ [x' :>>: y' | (x', y') <- shrink (x, y) ]
+  shrink (x :<>: y)  = [Empty, x, y, x :++: y]
+                     ++ [x' :<>: y' | (x', y') <- shrink (x, y) ]
+  shrink (x :><: y)  = [Empty, x, y, x :++: y]
+                     ++ [x' :><: y' | (x', y') <- shrink (x, y) ]
 
 instance (Arbitrary a, Ord a) => Arbitrary (Incidence a) where
-    arbitrary = arbitraryGraph
+  arbitrary = arbitraryGraph
 
 instance (Arbitrary a, Ord a) => Arbitrary (AdjacencyMap a) where
-    arbitrary = arbitraryGraph
+  arbitrary = arbitraryGraph
 
 instance Arbitrary IntAdjacencyMap where
-    arbitrary = arbitraryGraph
+  arbitrary = arbitraryGraph
 
 instance Arbitrary a => Arbitrary (Fold a) where
-    arbitrary = arbitraryGraph
+  arbitrary = arbitraryGraph
