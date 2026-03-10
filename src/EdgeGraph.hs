@@ -51,7 +51,7 @@ module EdgeGraph (
   ) where
 
 import Control.Applicative (Alternative, (<|>))
-import Control.Monad
+import Control.Monad (MonadPlus(..), ap)
 
 import qualified EdgeGraph.Class              as C
 import qualified EdgeGraph.Fold               as F

@@ -10,7 +10,7 @@ homepage:      https://github.com/jacklc3/algebraic-edge-graphs
 category:      Algebra, Algorithms, Data Structures, Graphs
 build-type:    Simple
 cabal-version: >=1.10
-tested-with:   GHC==8.0.2
+tested-with:   GHC==9.10.1
 description:
   A library for algebraic construction and manipulation of edge-indexed graphs
   in Haskell. Based on the theory of algebraic edge graphs.

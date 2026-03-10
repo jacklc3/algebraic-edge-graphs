@@ -608,7 +608,7 @@ data End a = Pit a | Tip a
 -- @
 -- shortestPaths id    g -- use edge labels as weights
 -- shortestPaths (const 1) g -- unit-weight shortest paths (hop count)
--- shortestPaths 'empty'    == Map.'Map.empty'
+-- shortestPaths id 'empty' == Map.'Map.empty'
 -- @
 shortestPaths :: (Ord a, Num w, Ord w)
               => (a -> w) -> Fold a -> Map.Map (End a, End a) w
@@ -626,7 +626,7 @@ widestPaths = semiringPaths max min maxBound
 
 -- | Generalised semiring path algorithm. Different semirings yield
 -- different algorithms. The @zero@ parameter must be the identity
--- element for @times@ and absorbing for @plus@.
+-- element for @times@.
 --
 -- * @semiringPaths min (+) 0 id@ — shortest paths
 -- * @semiringPaths max min maxBound id@ — widest (bottleneck) paths
