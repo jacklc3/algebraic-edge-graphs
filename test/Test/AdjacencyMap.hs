@@ -56,7 +56,6 @@ testAdjacencyMap = do
   testAdjacencyEdgeGroup @G
   testAdjacencyConnectGroup @G
 
-  -- Type-specific: scc
   putStrLn "\n============ scc ============"
   test "scc empty            == empty" $
         AM.scc (empty :: G) == empty

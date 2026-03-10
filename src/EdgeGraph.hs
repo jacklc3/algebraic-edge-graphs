@@ -44,13 +44,17 @@ module EdgeGraph (
     transpose, induce, simplify,
 
     -- * Graph composition
-    box
+    box,
+
+    -- * Conversion to Fold
+    toFold
   ) where
 
 import Control.Applicative (Alternative, (<|>))
 import Control.Monad
 
 import qualified EdgeGraph.Class              as C
+import qualified EdgeGraph.Fold               as F
 import qualified EdgeGraph.HigherKinded.Class as H
 import qualified EdgeGraph.Incidence          as I
 import qualified Data.IntSet                  as IntSet
@@ -696,3 +700,14 @@ simple op x y
 -- @
 box :: EdgeGraph a -> EdgeGraph b -> EdgeGraph (a, b)
 box = H.box
+
+-- | Convert an 'EdgeGraph' to the Boehm-Berarducci encoding ('F.Fold').
+-- This is useful for applying folds defined in "EdgeGraph.Fold",
+-- such as 'F.shortestPaths', 'F.reachable', and 'F.isAcyclic'.
+--
+-- @
+-- toFold 'empty'    == F.'F.empty'
+-- toFold ('edge' x) == F.'F.edge' x
+-- @
+toFold :: EdgeGraph a -> F.Fold a
+toFold = foldg F.empty F.edge F.overlay F.into F.pits F.tips

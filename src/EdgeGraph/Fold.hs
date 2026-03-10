@@ -43,7 +43,16 @@ module EdgeGraph.Fold (
   transpose, gmap, bind, induce, simplify,
 
   -- * Graph composition
-  box
+  box,
+
+  -- * Folds
+  End (..),
+  shortestPaths,
+  widestPaths,
+  semiringPaths,
+  reachable,
+  isReachable,
+  isAcyclic
 ) where
 
 import Control.Applicative hiding (empty)
@@ -54,6 +63,7 @@ import qualified EdgeGraph.Class              as C
 import qualified EdgeGraph.HigherKinded.Class as H
 import qualified EdgeGraph.Incidence          as I
 import qualified Data.IntSet                  as IntSet
+import qualified Data.Map.Strict              as Map
 import qualified Data.Set                     as Set
 
 {-| The 'Fold' datatype is the Boehm-Berarducci encoding of the core edge graph
@@ -583,3 +593,128 @@ box x y = C.overlays $ xs ++ ys
   where
     xs = map (\b -> gmap (,b) x) $ toList y
     ys = map (\a -> gmap (a,) y) $ toList x
+
+-- ---------------------------------------------------------------------------
+-- Folds
+-- ---------------------------------------------------------------------------
+
+-- | An edge endpoint. Each edge @a@ has a 'Pit' end (source, where the
+-- edge originates) and a 'Tip' end (destination, where the edge terminates).
+data End a = Pit a | Tip a
+  deriving (Show, Read, Eq, Ord)
+
+-- | Compute shortest paths between edge endpoints using a weight function.
+--
+-- @
+-- shortestPaths id    g -- use edge labels as weights
+-- shortestPaths (const 1) g -- unit-weight shortest paths (hop count)
+-- shortestPaths 'empty'    == Map.'Map.empty'
+-- @
+shortestPaths :: (Ord a, Num w, Ord w)
+              => (a -> w) -> Fold a -> Map.Map (End a, End a) w
+shortestPaths = semiringPaths min (+) 0
+
+-- | Compute widest (bottleneck) paths between edge endpoints using a
+-- weight function. Maximises the minimum edge weight along each path.
+--
+-- @
+-- widestPaths id (into (edge 5) (edge 3)) ! (Pit 5, Tip 3) == 3
+-- @
+widestPaths :: (Ord a, Ord w, Bounded w)
+            => (a -> w) -> Fold a -> Map.Map (End a, End a) w
+widestPaths = semiringPaths max min maxBound
+
+-- | Generalised semiring path algorithm. Different semirings yield
+-- different algorithms. The @zero@ parameter must be the identity
+-- element for @times@ and absorbing for @plus@.
+--
+-- * @semiringPaths min (+) 0 id@ — shortest paths
+-- * @semiringPaths max min maxBound id@ — widest (bottleneck) paths
+semiringPaths :: Ord a
+              => (w -> w -> w) -> (w -> w -> w) -> w -> (a -> w)
+              -> Fold a -> Map.Map (End a, End a) w
+semiringPaths plus times zero weight =
+  closure plus times . foldPathAlgebra plus zero weight
+
+-- | Compute reachability between edge endpoints.
+--
+-- @
+-- reachable 'empty'  == Map.'Map.empty'
+-- @
+reachable :: Ord a => Fold a -> Map.Map (End a, End a) Bool
+reachable = semiringPaths (||) (&&) True (const True)
+
+-- | Check if one edge can reach another via the graph structure.
+--
+-- @
+-- isReachable 1 2 ('into' ('edge' 1) ('edge' 2)) == True
+-- isReachable 2 1 ('into' ('edge' 1) ('edge' 2)) == False
+-- @
+isReachable :: Ord a => a -> a -> Fold a -> Bool
+isReachable x y g = Map.findWithDefault False (Tip x, Pit y) (reachable g)
+
+-- | Check if the graph is acyclic.
+--
+-- @
+-- isAcyclic 'empty'                        == True
+-- isAcyclic ('edge' 1)                     == True
+-- isAcyclic ('into' ('edge' 1) ('edge' 1)) == False
+-- @
+isAcyclic :: Ord a => Fold a -> Bool
+isAcyclic g = not $ any (\x -> Map.findWithDefault False (Tip x, Pit x) r) (edgeList g)
+  where r = reachable g
+
+-- ---------------------------------------------------------------------------
+-- Path algebra internals
+-- ---------------------------------------------------------------------------
+
+-- | The target algebra for semiring path folds. Pairs an underlying
+-- edge set with a map recording distances between pairs of 'End' values.
+type PathAlgebra a w = (Set.Set a, Map.Map (End a, End a) w)
+
+-- | Fold a graph into the semiring path algebra.
+foldPathAlgebra :: Ord a => (w -> w -> w) -> w -> (a -> w) -> Fold a -> PathAlgebra a w
+foldPathAlgebra plus zero weight = foldg emptyA edgeA overlayA connectA pitsA tipsA
+  where
+    emptyA = (Set.empty, Map.empty)
+    edgeA x = (Set.singleton x, Map.fromList
+      [ ((Pit x, Pit x), zero)
+      , ((Pit x, Tip x), weight x)
+      , ((Tip x, Tip x), zero)
+      ])
+    overlayA (s, m) (s', m') = (Set.union s s', Map.unionWith plus m m')
+    connectA = connectEndpoints plus zero Tip Pit
+    pitsA    = connectEndpoints plus zero Pit Pit
+    tipsA    = connectEndpoints plus zero Tip Tip
+
+-- | Connect endpoints of two path algebras. Adds zero-distance entries
+-- between the specified endpoints of edges in the left and right graphs.
+connectEndpoints :: Ord a
+                 => (w -> w -> w) -> w
+                 -> (a -> End a) -> (a -> End a)
+                 -> PathAlgebra a w -> PathAlgebra a w -> PathAlgebra a w
+connectEndpoints plus zero e e' (s, m) (s', m') =
+  (Set.union s s', Set.foldr addFrom (Map.unionWith plus m m') s)
+  where
+    addFrom x acc = Set.foldr (addPair x) acc s'
+    addPair x x' acc = Map.insertWith plus (e x, e' x') zero
+                     $ Map.insertWith plus (e' x', e x) zero acc
+
+-- | Floyd-Warshall transitive closure over a semiring. For each
+-- intermediate node @k@, relaxes all paths that pass through @k@.
+closure :: Ord a
+        => (w -> w -> w) -> (w -> w -> w)
+        -> PathAlgebra a w -> Map.Map (End a, End a) w
+closure plus times (s, m) = go nodes m
+  where
+    nodes = concatMap (\x -> [Pit x, Tip x]) (Set.toList s)
+    go []     dist = dist
+    go (k:ks) dist = go ks (relax k dist)
+    relax k dist =
+      let arrivals   = [(i, w) | ((i, j), w) <- Map.toAscList dist, j == k]
+          departures = [(j, w) | ((i, j), w) <- Map.toAscList dist, i == k]
+      in foldr (\(i, w1) d ->
+           foldr (\(j, w2) d' ->
+             Map.insertWith plus (i, j) (times w1 w2) d'
+           ) d departures
+         ) dist arrivals

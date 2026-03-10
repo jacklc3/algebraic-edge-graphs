@@ -51,7 +51,6 @@ testGraph = do
   testSimplifyGroup @G
   testBindGroup @G
 
-  -- Type-specific: structural equality
   putStrLn "\n============ (===) ============"
   test "    x === x                                             == True" $ sizeLimit $ \(x :: G) ->
            (x === x)                 == True
@@ -62,7 +61,6 @@ testGraph = do
   test "overlay (edge 1) (edge 2) === overlay (edge 2) (edge 1) == False" $
        (overlay (edge 1) (edge 2) === overlay (edge 2) (edge (1 :: Int))) == False
 
-  -- Type-specific: foldg length (not in Fold)
   putStrLn "\n============ foldg (length) ============"
   test "foldg 0 (const 1) (+) (+) (+) (+) == length" $ sizeLimit $ \(x :: G) ->
         EG.foldg 0 (const 1) (+) (+) (+) (+) x == length x

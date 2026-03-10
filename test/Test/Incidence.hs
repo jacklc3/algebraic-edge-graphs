@@ -17,7 +17,6 @@ testIncidence = do
   test "Consistency of arbitraryIncidence" $ sizeLimit $ \(m :: G) ->
       II.consistent m
 
-  -- Type-specific: Show
   putStrLn "\n============ Show ============"
   test "show (empty  :: Incidence Int)                    == \"empty\"" $
         show (empty  :: G) == "empty"
