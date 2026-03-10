@@ -6,8 +6,8 @@
 -- Maintainer : jackliellcock@gmail.com
 -- Stability  : experimental
 --
--- This module defines the 'Incidence' data type for algebraic edge graphs,
--- as well as associated operations and algorithms. 'Incidence' is an instance
+-- This module defines the t'Incidence' data type for algebraic edge graphs,
+-- as well as associated operations and algorithms. t'Incidence' is an instance
 -- of the 'C.EdgeGraph' type class, which can be used for polymorphic graph
 -- construction and manipulation.
 --
@@ -48,8 +48,8 @@ import qualified Data.Tree       as Tree
 -- Complexity: /O(n^2 * m)/ time.
 --
 -- @
--- isSubgraphOf 'empty' x          == True
--- isSubgraphOf ('edge' x) 'empty' == False
+-- isSubgraphOf 'EdgeGraph.Incidence.empty' x          == True
+-- isSubgraphOf ('edge' x) 'EdgeGraph.Incidence.empty' == False
 -- isSubgraphOf x ('overlay' x y)  == True
 -- @
 isSubgraphOf :: Ord a => Incidence a -> Incidence a -> Bool
@@ -59,7 +59,7 @@ isSubgraphOf x y = overlay x y == y
 -- Complexity: /O((n) * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- overlays []    == 'empty'
+-- overlays []    == 'EdgeGraph.Incidence.empty'
 -- overlays [x]   == x
 -- overlays [x,y] == 'overlay' x y
 -- @
@@ -70,7 +70,7 @@ overlays = C.overlays
 -- Complexity: /O((n) * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- intos []    == 'empty'
+-- intos []    == 'EdgeGraph.Incidence.empty'
 -- intos [x]   == x
 -- intos [x,y] == 'into' x y
 -- @
@@ -82,7 +82,7 @@ intos = C.intos
 -- of the given list.
 --
 -- @
--- path []      == 'empty'
+-- path []      == 'EdgeGraph.Incidence.empty'
 -- path [x]     == 'edge' x
 -- path [x,y]   == 'into' ('edge' x) ('edge' y)
 -- path [x,y,z] == 'overlays' ['into' ('edge' x) ('edge' y), 'into' ('edge' y) ('edge' z)]
@@ -96,7 +96,7 @@ path = C.path
 -- of the given list.
 --
 -- @
--- circuit []    == 'empty'
+-- circuit []    == 'EdgeGraph.Incidence.empty'
 -- circuit [x]   == 'into' ('edge' x) ('edge' x)
 -- circuit [x,y] == 'overlays' ['into' ('edge' x) ('edge' y), 'into' ('edge' y) ('edge' x)]
 -- @
@@ -108,7 +108,7 @@ circuit = C.circuit
 -- of the given list.
 --
 -- @
--- clique []    == 'empty'
+-- clique []    == 'EdgeGraph.Incidence.empty'
 -- clique [x]   == 'edge' x
 -- clique [x,y] == 'into' ('edge' x) ('edge' y)
 -- @
@@ -120,7 +120,7 @@ clique = C.clique
 -- where /L1/ and /L2/ are the lengths of the given lists.
 --
 -- @
--- biclique []  []  == 'empty'
+-- biclique []  []  == 'EdgeGraph.Incidence.empty'
 -- biclique [x] []  == 'edge' x
 -- biclique []  [y] == 'edge' y
 -- @
@@ -137,7 +137,7 @@ flower = C.flower
 -- length of the given lists.
 --
 -- @
--- node []  []  == 'empty'
+-- node []  []  == 'EdgeGraph.Incidence.empty'
 -- node [x] []  == 'edge' x
 -- node []  [y] == 'edge' y
 -- node [x] [y] == 'into' ('edge' x) ('edge' y)
@@ -145,20 +145,20 @@ flower = C.flower
 node :: Ord a => [a] -> [a] -> Incidence a
 node = C.node
 
--- | The /tree graph/ constructed from a given 'Tree' data structure.
+-- | The /tree graph/ constructed from a given 'Data.Tree.Tree' data structure.
 -- Complexity: /O(T * log(T))/ time and /O(T)/ memory, where /T/ is the size
 -- of the given tree.
 tree :: Ord a => Tree.Tree a -> Incidence a
 tree = C.tree
 
--- | The /forest graph/ constructed from a given 'Forest' data structure.
+-- | The /forest graph/ constructed from a given 'Data.Tree.Forest' data structure.
 -- Complexity: /O(F * log(F))/ time and /O(F)/ memory, where /F/ is the size
 -- of the given forest.
 forest :: Ord a => Tree.Forest a -> Incidence a
 forest = C.forest
 
 -- | The function @replaceEdge x y@ replaces edge @x@ with edge
--- label @y@ in a given 'Incidence'. If @y@ already exists, the labels
+-- label @y@ in a given t'Incidence'. If @y@ already exists, the labels
 -- will be merged.
 -- Complexity: /O(n * m * log(m))/ time.
 --
@@ -186,7 +186,7 @@ mergeEdges p v = gmap (\u -> if p u then v else u)
 -- Complexity: /O(n * m)/ time.
 --
 -- @
--- edgeIntSet 'empty'    == IntSet.'IntSet.empty'
+-- edgeIntSet 'EdgeGraph.Incidence.empty'    == IntSet.'IntSet.empty'
 -- edgeIntSet ('edge' x) == IntSet.'IntSet.singleton' x
 -- @
 edgeIntSet :: Incidence Int -> IntSet.IntSet

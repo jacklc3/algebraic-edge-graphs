@@ -9,7 +9,7 @@
 --
 -- This module defines the core data type 'EdgeGraph' for algebraic edge graphs
 -- and associated algorithms. 'EdgeGraph' is a deep embedding of the six
--- algebraic edge graph construction primitives: 'empty', 'edge', 'overlay',
+-- algebraic edge graph construction primitives: 'EdgeGraph.empty', 'EdgeGraph.edge', 'overlay',
 -- 'into', 'pits', and 'tips'.
 --
 -- 'EdgeGraph' is an instance of the type class defined in "EdgeGraph.Class",
@@ -62,13 +62,13 @@ import qualified Data.Set                     as Set
 import qualified Data.Tree                    as Tree
 
 {-| The 'EdgeGraph' datatype is a deep embedding of the core edge graph
-construction primitives 'empty', 'edge', 'overlay', 'into', 'pits' and 'tips'.
+construction primitives 'EdgeGraph.empty', 'EdgeGraph.edge', 'overlay', 'into', 'pits' and 'tips'.
 The 'Eq' instance is implemented using the 'I.Incidence' as the /canonical
 graph representation/ and satisfies all axioms of algebraic edge graphs.
-In equations we use the infix operators '(+++)' for 'overlay', '(>+>)' for
-'into', '(<+>)' for 'pits', and '(>+<)' for 'tips'.
+In equations we use the infix operators '(EdgeGraph.Class.+++)' for 'overlay', '(EdgeGraph.Class.>+>)' for
+'into', '(EdgeGraph.Class.<+>)' for 'pits', and '(EdgeGraph.Class.>+<)' for 'tips'.
 
-    * 'overlay' is commutative, associative, and idempotent with 'empty' as
+    * 'overlay' is commutative, associative, and idempotent with 'EdgeGraph.empty' as
       the identity:
 
         >         x +++ y == y +++ x
@@ -76,11 +76,11 @@ In equations we use the infix operators '(+++)' for 'overlay', '(>+>)' for
         >         x +++ x == x
         >     x +++ empty == x
 
-    * 'empty' is the identity for 'into', 'pits', and 'tips'. 'pits' and
+    * 'EdgeGraph.empty' is the identity for 'into', 'pits', and 'tips'. 'pits' and
       'tips' are commutative.
 
     * Decomposition: for any two connect operators @f@ and @g@ (each being
-      any of '(>+>)', '(<+>)', or '(>+<)'):
+      any of '(EdgeGraph.Class.>+>)', '(EdgeGraph.Class.<+>)', or '(EdgeGraph.Class.>+<)'):
 
         > f x (g y z) == f x y +++ f x z +++ g y z
         > g (f x y) z == f x y +++ g x z +++ g y z
@@ -108,15 +108,15 @@ Note that 'size' is slightly different from the 'length' method of the
 'Foldable' type class, as the latter does not count 'Empty' leaves of the
 expression:
 
-@'length' 'empty'                == 0
-'size'   'empty'                 == 1
-'length' ('edge' x)              == 1
-'size'   ('edge' x)              == 1
-'length' ('empty' '+++' 'empty') == 0
-'size'   ('empty' '+++' 'empty') == 2@
+@'length' 'EdgeGraph.empty'                == 0
+'size'   'EdgeGraph.empty'                 == 1
+'length' ('EdgeGraph.edge' x)              == 1
+'size'   ('EdgeGraph.edge' x)              == 1
+'length' ('EdgeGraph.empty' 'EdgeGraph.Class.+++' 'EdgeGraph.empty') == 0
+'size'   ('EdgeGraph.empty' 'EdgeGraph.Class.+++' 'EdgeGraph.empty') == 2@
 
 The 'size' of any graph is positive, and the difference @('size' g - 'length' g)@
-corresponds to the number of occurrences of 'empty' in an expression @g@.
+corresponds to the number of occurrences of 'EdgeGraph.empty' in an expression @g@.
 -}
 data EdgeGraph a
   = Empty
@@ -197,7 +197,7 @@ edge :: a -> EdgeGraph a
 edge = Edge
 
 -- | /Overlay/ two graphs. An alias for the constructor ':++:'. This is an
--- idempotent, commutative and associative operation with the identity 'empty'.
+-- idempotent, commutative and associative operation with the identity 'EdgeGraph.empty'.
 -- Complexity: /O(1)/ time and memory, /O(s1 + s2)/ size.
 --
 -- @
@@ -209,7 +209,7 @@ overlay = (:++:)
 
 -- | /Into/ two graphs. An alias for the constructor ':>>:'. Connects the pits
 -- of the left graph to the tips of the right graph. This is an associative
--- operation with the identity 'empty', which distributes over 'overlay' and
+-- operation with the identity 'EdgeGraph.empty', which distributes over 'overlay' and
 -- obeys the decomposition axiom.
 -- Complexity: /O(1)/ time and memory, /O(s1 + s2)/ size.
 --
@@ -222,7 +222,7 @@ into = (:>>:)
 
 -- | /Pits/ two graphs. An alias for the constructor ':<>:'. Connects nodes
 -- where outgoing edges (pits) overlap. This is an associative operation with
--- the identity 'empty', which distributes over 'overlay'.
+-- the identity 'EdgeGraph.empty', which distributes over 'overlay'.
 -- Complexity: /O(1)/ time and memory, /O(s1 + s2)/ size.
 --
 -- @
@@ -234,7 +234,7 @@ pits = (:<>:)
 
 -- | /Tips/ two graphs. An alias for the constructor ':><:'. Connects nodes
 -- where incoming edges (tips) overlap. This is an associative operation with
--- the identity 'empty', which distributes over 'overlay'.
+-- the identity 'EdgeGraph.empty', which distributes over 'overlay'.
 -- Complexity: /O(1)/ time and memory, /O(s1 + s2)/ size.
 --
 -- @
@@ -249,8 +249,8 @@ tips = (:><:)
 -- given list.
 --
 -- @
--- edges []  == 'empty'
--- edges [x] == 'edge' x
+-- edges []  == 'EdgeGraph.empty'
+-- edges [x] == 'EdgeGraph.edge' x
 -- @
 edges :: [a] -> EdgeGraph a
 edges = C.edges
@@ -260,7 +260,7 @@ edges = C.edges
 -- of the given list, and /S/ is the sum of sizes of the graphs in the list.
 --
 -- @
--- overlays []          == 'empty'
+-- overlays []          == 'EdgeGraph.empty'
 -- overlays [x]         == x
 -- overlays [x,y]       == 'overlay' x y
 -- 'isEmpty' . overlays == 'all' 'isEmpty'
@@ -273,7 +273,7 @@ overlays = C.overlays
 -- of the given list, and /S/ is the sum of sizes of the graphs in the list.
 --
 -- @
--- intos []          == 'empty'
+-- intos []          == 'EdgeGraph.empty'
 -- intos [x]         == x
 -- intos [x,y]       == 'into' x y
 -- 'isEmpty' . intos == 'all' 'isEmpty'
@@ -289,7 +289,7 @@ intos = C.intos
 -- complexity of 'size' is /O(s)/, since all functions have cost /O(1)/.
 --
 -- @
--- foldg 'empty' 'edge' 'overlay' 'into' 'pits' 'tips' == id
+-- foldg 'EdgeGraph.empty' 'EdgeGraph.edge' 'overlay' 'into' 'pits' 'tips' == id
 -- foldg []    (\\x -> [x])  (++)  (++) (++) (++)      == 'Data.Foldable.toList'
 -- foldg 0     (const 1)     (+)   (+)  (+)  (+)       == 'Data.Foldable.length'
 -- foldg 1     (const 1)     (+)   (+)  (+)  (+)       == 'size'
@@ -311,8 +311,8 @@ foldg e v o c p t = go
 -- the canonical incidence representation.
 --
 -- @
--- isSubgraphOf 'empty'    x               == True
--- isSubgraphOf ('edge' x) 'empty'         == False
+-- isSubgraphOf 'EdgeGraph.empty'    x               == True
+-- isSubgraphOf ('EdgeGraph.edge' x) 'EdgeGraph.empty'         == False
 -- isSubgraphOf x          ('overlay' x y) == True
 -- @
 isSubgraphOf :: Ord a => EdgeGraph a -> EdgeGraph a -> Bool
@@ -324,9 +324,9 @@ isSubgraphOf x y = I.isSubgraphOf (C.toEdgeGraph x) (C.toEdgeGraph y)
 --
 -- @
 --                               x === x                               == True
---                               x === 'overlay' x 'empty'             == False
+--                               x === 'overlay' x 'EdgeGraph.empty'             == False
 --                   'overlay' x y === 'overlay' x y                   == True
--- 'overlay' ('edge' 1) ('edge' 2) === 'overlay' ('edge' 2) ('edge' 1) == False
+-- 'overlay' ('EdgeGraph.edge' 1) ('EdgeGraph.edge' 2) === 'overlay' ('EdgeGraph.edge' 2) ('EdgeGraph.edge' 1) == False
 -- @
 (===) :: Eq a => EdgeGraph a -> EdgeGraph a -> Bool
 Empty        === Empty        = True
@@ -343,10 +343,10 @@ infix 4 ===
 -- Complexity: /O(s)/ time.
 --
 -- @
--- isEmpty 'empty'                     == True
--- isEmpty ('overlay' 'empty' 'empty') == True
--- isEmpty ('edge' x)                  == False
--- isEmpty ('removeEdge' x $ 'edge' x) == True
+-- isEmpty 'EdgeGraph.empty'                     == True
+-- isEmpty ('overlay' 'EdgeGraph.empty' 'EdgeGraph.empty') == True
+-- isEmpty ('EdgeGraph.edge' x)                  == False
+-- isEmpty ('removeEdge' x $ 'EdgeGraph.edge' x) == True
 -- @
 isEmpty :: EdgeGraph a -> Bool
 isEmpty = null
@@ -356,8 +356,8 @@ isEmpty = null
 -- Complexity: /O(s)/ time.
 --
 -- @
--- size 'empty'         == 1
--- size ('edge' x)      == 1
+-- size 'EdgeGraph.empty'         == 1
+-- size ('EdgeGraph.edge' x)      == 1
 -- size ('overlay' x y) == size x + size y
 -- size ('into' x y)    == size x + size y
 -- size ('pits' x y)    == size x + size y
@@ -371,8 +371,8 @@ size = foldg 1 (const 1) (+) (+) (+) (+)
 -- Complexity: /O(s)/ time.
 --
 -- @
--- hasEdge x 'empty'          == False
--- hasEdge x ('edge' x)       == True
+-- hasEdge x 'EdgeGraph.empty'          == False
+-- hasEdge x ('EdgeGraph.edge' x)       == True
 -- hasEdge x . 'removeEdge' x == const False
 -- @
 hasEdge :: Eq a => a -> EdgeGraph a -> Bool
@@ -382,8 +382,8 @@ hasEdge = elem
 -- Complexity: /O(s * log(n))/ time.
 --
 -- @
--- edgeCount 'empty'    == 0
--- edgeCount ('edge' x) == 1
+-- edgeCount 'EdgeGraph.empty'    == 0
+-- edgeCount ('EdgeGraph.edge' x) == 1
 -- edgeCount            == 'length' . 'edgeList'
 -- @
 edgeCount :: Ord a => EdgeGraph a -> Int
@@ -393,8 +393,8 @@ edgeCount = I.edgeCount . C.toEdgeGraph
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeList 'empty'    == []
--- edgeList ('edge' x) == [x]
+-- edgeList 'EdgeGraph.empty'    == []
+-- edgeList ('EdgeGraph.edge' x) == [x]
 -- edgeList . 'edges'  == 'Data.List.nub' . 'Data.List.sort'
 -- @
 edgeList :: Ord a => EdgeGraph a -> [a]
@@ -404,8 +404,8 @@ edgeList = Set.toAscList . edgeSet
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeSet 'empty'   == Set.'Set.empty'
--- edgeSet . 'edge'  == Set.'Set.singleton'
+-- edgeSet 'EdgeGraph.empty'   == Set.'Set.empty'
+-- edgeSet . 'EdgeGraph.edge'  == Set.'Set.singleton'
 -- edgeSet . 'edges' == Set.'Set.fromList'
 -- @
 edgeSet :: Ord a => EdgeGraph a -> Set.Set a
@@ -416,8 +416,8 @@ edgeSet = foldr Set.insert Set.empty
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeIntSet 'empty'   == IntSet.'IntSet.empty'
--- edgeIntSet . 'edge'  == IntSet.'IntSet.singleton'
+-- edgeIntSet 'EdgeGraph.empty'   == IntSet.'IntSet.empty'
+-- edgeIntSet . 'EdgeGraph.edge'  == IntSet.'IntSet.singleton'
 -- edgeIntSet . 'edges' == IntSet.'IntSet.fromList'
 -- @
 edgeIntSet :: EdgeGraph Int -> IntSet.IntSet
@@ -427,8 +427,8 @@ edgeIntSet = foldr IntSet.insert IntSet.empty
 -- Complexity: /O(s + n * log(n))/ time.
 --
 -- @
--- nodeCount 'empty'    == 0
--- nodeCount ('edge' x) == 2
+-- nodeCount 'EdgeGraph.empty'    == 0
+-- nodeCount ('EdgeGraph.edge' x) == 2
 -- @
 nodeCount :: Ord a => EdgeGraph a -> Int
 nodeCount = I.nodeCount . C.toEdgeGraph
@@ -437,8 +437,8 @@ nodeCount = I.nodeCount . C.toEdgeGraph
 -- Complexity: /O(s + n * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- nodeList 'empty'    == []
--- nodeList ('edge' x) == ['I.Node' (Set.'Set.singleton' x) (Set.'Set.singleton' x)]
+-- nodeList 'EdgeGraph.empty'    == []
+-- nodeList ('EdgeGraph.edge' x) == ['I.Node' (Set.'Set.singleton' x) (Set.'Set.singleton' x)]
 -- @
 nodeList :: Ord a => EdgeGraph a -> [I.Node a]
 nodeList = I.nodeList . C.toEdgeGraph
@@ -447,7 +447,7 @@ nodeList = I.nodeList . C.toEdgeGraph
 -- Complexity: /O(s + n * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- nodeSet 'empty' == Set.'Set.empty'
+-- nodeSet 'EdgeGraph.empty' == Set.'Set.empty'
 -- @
 nodeSet :: Ord a => EdgeGraph a -> Set.Set (I.Node a)
 nodeSet = I.nodeSet . C.toEdgeGraph
@@ -457,10 +457,10 @@ nodeSet = I.nodeSet . C.toEdgeGraph
 -- given list.
 --
 -- @
--- path []      == 'empty'
--- path [x]     == 'edge' x
--- path [x,y]   == 'into' ('edge' x) ('edge' y)
--- path [x,y,z] == 'overlays' ['into' ('edge' x) ('edge' y), 'into' ('edge' y) ('edge' z)]
+-- path []      == 'EdgeGraph.empty'
+-- path [x]     == 'EdgeGraph.edge' x
+-- path [x,y]   == 'into' ('EdgeGraph.edge' x) ('EdgeGraph.edge' y)
+-- path [x,y,z] == 'overlays' ['into' ('EdgeGraph.edge' x) ('EdgeGraph.edge' y), 'into' ('EdgeGraph.edge' y) ('EdgeGraph.edge' z)]
 -- @
 path :: [a] -> EdgeGraph a
 path = C.path
@@ -471,9 +471,9 @@ path = C.path
 -- given list.
 --
 -- @
--- circuit []    == 'empty'
--- circuit [x]   == 'into' ('edge' x) ('edge' x)
--- circuit [x,y] == 'overlays' ['into' ('edge' x) ('edge' y), 'into' ('edge' y) ('edge' x)]
+-- circuit []    == 'EdgeGraph.empty'
+-- circuit [x]   == 'into' ('EdgeGraph.edge' x) ('EdgeGraph.edge' x)
+-- circuit [x,y] == 'overlays' ['into' ('EdgeGraph.edge' x) ('EdgeGraph.edge' y), 'into' ('EdgeGraph.edge' y) ('EdgeGraph.edge' x)]
 -- @
 circuit :: [a] -> EdgeGraph a
 circuit = C.circuit
@@ -483,9 +483,9 @@ circuit = C.circuit
 -- given list.
 --
 -- @
--- clique []    == 'empty'
--- clique [x]   == 'edge' x
--- clique [x,y] == 'into' ('edge' x) ('edge' y)
+-- clique []    == 'EdgeGraph.empty'
+-- clique [x]   == 'EdgeGraph.edge' x
+-- clique [x,y] == 'into' ('EdgeGraph.edge' x) ('EdgeGraph.edge' y)
 -- @
 clique :: [a] -> EdgeGraph a
 clique = C.clique
@@ -495,9 +495,9 @@ clique = C.clique
 -- lengths of the given lists.
 --
 -- @
--- biclique []  []  == 'empty'
--- biclique [x] []  == 'edge' x
--- biclique []  [y] == 'edge' y
+-- biclique []  []  == 'EdgeGraph.empty'
+-- biclique [x] []  == 'EdgeGraph.edge' x
+-- biclique []  [y] == 'EdgeGraph.edge' y
 -- @
 biclique :: [a] -> [a] -> EdgeGraph a
 biclique = C.biclique
@@ -508,9 +508,9 @@ biclique = C.biclique
 -- given list.
 --
 -- @
--- flower []    == 'empty'
--- flower [x]   == 'into' ('edge' x) ('edge' x)
--- flower [x,y] == 'intos' ['edge' x, 'edge' y, 'edge' x]
+-- flower []    == 'EdgeGraph.empty'
+-- flower [x]   == 'into' ('EdgeGraph.edge' x) ('EdgeGraph.edge' x)
+-- flower [x,y] == 'intos' ['EdgeGraph.edge' x, 'EdgeGraph.edge' y, 'EdgeGraph.edge' x]
 -- @
 flower :: [a] -> EdgeGraph a
 flower = C.flower
@@ -522,22 +522,22 @@ flower = C.flower
 -- lengths of the given lists.
 --
 -- @
--- node []  []    == 'empty'
--- node [x] []    == 'edge' x
--- node []  [y]   == 'edge' y
--- node [x] [y]   == 'into' ('edge' x) ('edge' y)
--- node [x] [y,z] == 'into' ('edge' x) ('tips' ('edge' y) ('edge' z))
+-- node []  []    == 'EdgeGraph.empty'
+-- node [x] []    == 'EdgeGraph.edge' x
+-- node []  [y]   == 'EdgeGraph.edge' y
+-- node [x] [y]   == 'into' ('EdgeGraph.edge' x) ('EdgeGraph.edge' y)
+-- node [x] [y,z] == 'into' ('EdgeGraph.edge' x) ('tips' ('EdgeGraph.edge' y) ('EdgeGraph.edge' z))
 -- @
 node :: [a] -> [a] -> EdgeGraph a
 node = C.node
 
--- | The /tree graph/ constructed from a given 'Tree' data structure.
+-- | The /tree graph/ constructed from a given 'Data.Tree.Tree' data structure.
 -- Complexity: /O(T)/ time, memory and size, where /T/ is the size of the
 -- given tree (i.e. the number of vertices in the tree).
 tree :: Tree.Tree a -> EdgeGraph a
 tree = C.tree
 
--- | The /forest graph/ constructed from a given 'Forest' data structure.
+-- | The /forest graph/ constructed from a given 'Data.Tree.Forest' data structure.
 -- Complexity: /O(F)/ time, memory and size, where /F/ is the size of the
 -- given forest (i.e. the number of vertices in the forest).
 forest :: Tree.Forest a -> EdgeGraph a
@@ -548,9 +548,9 @@ forest = C.forest
 -- lengths of the given lists.
 --
 -- @
--- mesh xs  []  == 'empty'
--- mesh []  ys  == 'empty'
--- mesh [x] [y] == 'edge' (x, y)
+-- mesh xs  []  == 'EdgeGraph.empty'
+-- mesh []  ys  == 'EdgeGraph.empty'
+-- mesh [x] [y] == 'EdgeGraph.edge' (x, y)
 -- @
 mesh :: [a] -> [b] -> EdgeGraph (a, b)
 mesh = H.mesh
@@ -560,9 +560,9 @@ mesh = H.mesh
 -- lengths of the given lists.
 --
 -- @
--- torus xs  []  == 'empty'
--- torus []  ys  == 'empty'
--- torus [x] [y] == 'edge' (x, y) :>>: 'edge' (x, y)
+-- torus xs  []  == 'EdgeGraph.empty'
+-- torus []  ys  == 'EdgeGraph.empty'
+-- torus [x] [y] == 'EdgeGraph.edge' (x, y) :>>: 'EdgeGraph.edge' (x, y)
 -- @
 torus :: [a] -> [b] -> EdgeGraph (a, b)
 torus = H.torus
@@ -573,18 +573,18 @@ torus = H.torus
 -- alphabet and /D/ is the dimension of the graph.
 --
 -- @
--- deBruijn k []    == 'empty'
+-- deBruijn k []    == 'EdgeGraph.empty'
 -- deBruijn 1 [0,1] == 'edges' [ [0], [0], [1], [1] ]
 -- @
 deBruijn :: Int -> [a] -> EdgeGraph [a]
 deBruijn = H.deBruijn
 
 -- | Remove all occurrences of an edge from the given graph. Edges
--- that are removed leave behind 'empty'.
+-- that are removed leave behind 'EdgeGraph.empty'.
 -- Complexity: /O(s)/ time, memory and size.
 --
 -- @
--- removeEdge x ('edge' x)     == 'empty'
+-- removeEdge x ('EdgeGraph.edge' x)     == 'EdgeGraph.empty'
 -- removeEdge x . removeEdge x == removeEdge x
 -- @
 removeEdge :: Eq a => a -> EdgeGraph a -> EdgeGraph a
@@ -597,7 +597,7 @@ removeEdge x = induce (/= x)
 --
 -- @
 -- replaceEdge x x            == id
--- replaceEdge x y ('edge' x) == 'edge' y
+-- replaceEdge x y ('EdgeGraph.edge' x) == 'EdgeGraph.edge' y
 -- replaceEdge x y            == 'mergeEdges' (== x) y
 -- @
 replaceEdge :: Eq a => a -> a -> EdgeGraph a -> EdgeGraph a
@@ -632,8 +632,8 @@ splitEdge v us g = g >>= \w -> if w == v then edges us else edge w
 -- Complexity: /O(s)/ time, memory and size.
 --
 -- @
--- transpose 'empty'     == 'empty'
--- transpose ('edge' x)  == 'edge' x
+-- transpose 'EdgeGraph.empty'     == 'EdgeGraph.empty'
+-- transpose ('EdgeGraph.edge' x)  == 'EdgeGraph.edge' x
 -- transpose . transpose == id
 -- @
 transpose :: EdgeGraph a -> EdgeGraph a
@@ -646,7 +646,7 @@ transpose = foldg Empty Edge (:++:) (flip (:>>:)) (:><:) (:<>:)
 --
 -- @
 -- induce (const True)  x        == x
--- induce (const False) x        == 'empty'
+-- induce (const False) x        == 'EdgeGraph.empty'
 -- induce (/= x)                 == 'removeEdge' x
 -- induce p . induce q           == induce (\\x -> p x && q x)
 -- 'isSubgraphOf' (induce p x) x == True
@@ -664,9 +664,9 @@ induce p = foldg Empty (\x -> if p x then Edge x else Empty) (:++:) (:>>:) (:<>:
 -- @
 -- simplify x                         ==    x
 -- 'size' (simplify x)                <=    'size' x
--- simplify 'empty'                   '===' 'empty'
--- simplify ('edge' 1)                '===' 'edge' 1
--- simplify ('edge' 1 '+++' 'edge' 1) '===' 'edge' 1
+-- simplify 'EdgeGraph.empty'                   '===' 'EdgeGraph.empty'
+-- simplify ('EdgeGraph.edge' 1)                '===' 'EdgeGraph.edge' 1
+-- simplify ('EdgeGraph.edge' 1 'EdgeGraph.Class.+++' 'EdgeGraph.edge' 1) '===' 'EdgeGraph.edge' 1
 -- @
 simplify :: Ord a => EdgeGraph a -> EdgeGraph a
 simplify = foldg Empty Edge (simple (:++:)) (simple (:>>:)) (simple (:<>:)) (simple (:><:))
@@ -688,15 +688,15 @@ simple op x y
 -- @
 -- Up to an isomorphism between the resulting edge types, this operation
 -- is /commutative/, /associative/, /distributes/ over 'overlay', has singleton
--- graphs as /identities/ and 'empty' as the /annihilating zero/. Below @~~@
+-- graphs as /identities/ and 'EdgeGraph.empty' as the /annihilating zero/. Below @~~@
 -- stands for the equality up to an isomorphism, e.g. @(x, ()) ~~ x@.
 --
 -- @
 -- box x y               ~~ box y x
 -- box x (box y z)       ~~ box (box x y) z
 -- box x ('overlay' y z) == 'overlay' (box x y) (box x z)
--- box x ('edge' ())     ~~ x
--- box x 'empty'         ~~ 'empty'
+-- box x ('EdgeGraph.edge' ())     ~~ x
+-- box x 'EdgeGraph.empty'         ~~ 'EdgeGraph.empty'
 -- @
 box :: EdgeGraph a -> EdgeGraph b -> EdgeGraph (a, b)
 box = H.box
@@ -706,8 +706,8 @@ box = H.box
 -- such as 'F.shortestPaths', 'F.reachable', and 'F.isAcyclic'.
 --
 -- @
--- toFold 'empty'    == F.'F.empty'
--- toFold ('edge' x) == F.'F.edge' x
+-- toFold 'EdgeGraph.empty'    == F.'F.empty'
+-- toFold ('EdgeGraph.edge' x) == F.'F.edge' x
 -- @
 toFold :: EdgeGraph a -> F.Fold a
 toFold = foldg F.empty F.edge F.overlay F.into F.pits F.tips

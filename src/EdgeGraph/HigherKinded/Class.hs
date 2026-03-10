@@ -59,19 +59,19 @@ The core higher-kinded type class for constructing algebraic edge graphs is
 defined by introducing the 'into', 'pits' and 'tips' methods to the standard
 'MonadPlus' class and reusing the following existing methods:
 
-* The 'empty' method comes from the 'Control.Applicative.Alternative' class and
+* The 'EdgeGraph.HigherKinded.Class.empty' method comes from the 'Control.Applicative.Alternative' class and
 corresponds to the /empty graph/. This module simply re-exports it.
 
 * The 'edge' graph construction primitive is an alias for 'pure' of the
 'Applicative' type class.
 
-* Graph 'overlay' is an alias for '<|>' of the 'Alternative' type class.
+* Graph 'overlay' is an alias for '<|>' of the 'Control.Applicative.Alternative' type class.
 
 The 'EdgeGraph' type class is characterised by the following minimal set of
-axioms. In equations we use the infix operators '(+++)' for 'overlay',
-'(>+>)' for 'into', '(<+>)' for 'pits', and '(>+<)' for 'tips'.
+axioms. In equations we use the infix operators '(EdgeGraph.Class.+++)' for 'overlay',
+'(EdgeGraph.Class.>+>)' for 'into', '(EdgeGraph.Class.<+>)' for 'pits', and '(EdgeGraph.Class.>+<)' for 'tips'.
 
-    * 'overlay' is commutative, associative, and idempotent with 'empty' as
+    * 'overlay' is commutative, associative, and idempotent with 'EdgeGraph.HigherKinded.Class.empty' as
       the identity:
 
         >         x +++ y == y +++ x
@@ -79,7 +79,7 @@ axioms. In equations we use the infix operators '(+++)' for 'overlay',
         >         x +++ x == x
         >     x +++ empty == x
 
-    * 'empty' is the identity for 'into', 'pits', and 'tips':
+    * 'EdgeGraph.HigherKinded.Class.empty' is the identity for 'into', 'pits', and 'tips':
 
         > empty >+> x == x
         > x >+> empty == x
@@ -94,7 +94,7 @@ axioms. In equations we use the infix operators '(+++)' for 'overlay',
         > x >+< y == y >+< x
 
     * Decomposition: for any two connect operators @f@ and @g@ (each being
-      any of '(>+>)', '(<+>)', or '(>+<)'):
+      any of '(EdgeGraph.Class.>+>)', '(EdgeGraph.Class.<+>)', or '(EdgeGraph.Class.>+<)'):
 
         > f x (g y z) == f x y +++ f x z +++ g y z
         > g (f x y) z == f x y +++ g x z +++ g y z
@@ -158,7 +158,7 @@ overlay = (<|>)
 -- given list.
 --
 -- @
--- edges []  == 'empty'
+-- edges []  == 'EdgeGraph.HigherKinded.Class.empty'
 -- edges [x] == 'edge' x
 -- @
 edges :: EdgeGraph g => [a] -> g a
@@ -169,7 +169,7 @@ edges = overlays . map edge
 -- of the given list, and /S/ is the sum of sizes of the graphs in the list.
 --
 -- @
--- overlays []    == 'empty'
+-- overlays []    == 'EdgeGraph.HigherKinded.Class.empty'
 -- overlays [x]   == x
 -- overlays [x,y] == 'overlay' x y
 -- @
@@ -181,7 +181,7 @@ overlays = msum
 -- of the given list, and /S/ is the sum of sizes of the graphs in the list.
 --
 -- @
--- intos []    == 'empty'
+-- intos []    == 'EdgeGraph.HigherKinded.Class.empty'
 -- intos [x]   == x
 -- intos [x,y] == 'into' x y
 -- @
@@ -206,8 +206,8 @@ tipss = foldr tips empty
 -- a particular graph instance.
 --
 -- @
--- isSubgraphOf 'empty'    x               == True
--- isSubgraphOf ('edge' x) 'empty'         == False
+-- isSubgraphOf 'EdgeGraph.HigherKinded.Class.empty'    x               == True
+-- isSubgraphOf ('edge' x) 'EdgeGraph.HigherKinded.Class.empty'         == False
 -- isSubgraphOf x          ('overlay' x y) == True
 -- @
 isSubgraphOf :: (EdgeGraph g, Eq (g a)) => g a -> g a -> Bool
@@ -217,8 +217,8 @@ isSubgraphOf x y = overlay x y == y
 -- Complexity: /O(s)/ time.
 --
 -- @
--- isEmpty 'empty'                     == True
--- isEmpty ('overlay' 'empty' 'empty') == True
+-- isEmpty 'EdgeGraph.HigherKinded.Class.empty'                     == True
+-- isEmpty ('overlay' 'EdgeGraph.HigherKinded.Class.empty' 'EdgeGraph.HigherKinded.Class.empty') == True
 -- isEmpty ('edge' x)                  == False
 -- isEmpty ('removeEdge' x $ 'edge' x) == True
 -- @
@@ -229,7 +229,7 @@ isEmpty = null
 -- Complexity: /O(s)/ time.
 --
 -- @
--- hasEdge x 'empty'          == False
+-- hasEdge x 'EdgeGraph.HigherKinded.Class.empty'          == False
 -- hasEdge x ('edge' x)       == True
 -- hasEdge x . 'removeEdge' x == const False
 -- @
@@ -240,7 +240,7 @@ hasEdge = elem
 -- Complexity: /O(s * log(n))/ time.
 --
 -- @
--- edgeCount 'empty'    == 0
+-- edgeCount 'EdgeGraph.HigherKinded.Class.empty'    == 0
 -- edgeCount ('edge' x) == 1
 -- edgeCount            == 'length' . 'edgeList'
 -- @
@@ -251,7 +251,7 @@ edgeCount = length . edgeList
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeList 'empty'    == []
+-- edgeList 'EdgeGraph.HigherKinded.Class.empty'    == []
 -- edgeList ('edge' x) == [x]
 -- @
 edgeList :: (Ord a, EdgeGraph g) => g a -> [a]
@@ -261,7 +261,7 @@ edgeList = Set.toAscList . edgeSet
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeSet 'empty'  == Set.'Set.empty'
+-- edgeSet 'EdgeGraph.HigherKinded.Class.empty'  == Set.'Set.empty'
 -- edgeSet . 'edge' == Set.'Set.singleton'
 -- @
 edgeSet :: (Ord a, EdgeGraph g) => g a -> Set.Set a
@@ -272,7 +272,7 @@ edgeSet = foldr Set.insert Set.empty
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeIntSet 'empty'  == IntSet.'IntSet.empty'
+-- edgeIntSet 'EdgeGraph.HigherKinded.Class.empty'  == IntSet.'IntSet.empty'
 -- edgeIntSet . 'edge' == IntSet.'IntSet.singleton'
 -- @
 edgeIntSet :: EdgeGraph g => g Int -> IntSet.IntSet
@@ -283,7 +283,7 @@ edgeIntSet = foldr IntSet.insert IntSet.empty
 -- given list.
 --
 -- @
--- path []      == 'empty'
+-- path []      == 'EdgeGraph.HigherKinded.Class.empty'
 -- path [x]     == 'edge' x
 -- path [x,y]   == 'into' ('edge' x) ('edge' y)
 -- path [x,y,z] == 'overlays' ['into' ('edge' x) ('edge' y), 'into' ('edge' y) ('edge' z)]
@@ -299,7 +299,7 @@ path xs  = overlays $ zipWith (\a b -> into (edge a) (edge b)) xs (drop 1 xs)
 -- given list.
 --
 -- @
--- circuit []    == 'empty'
+-- circuit []    == 'EdgeGraph.HigherKinded.Class.empty'
 -- circuit [x]   == 'into' ('edge' x) ('edge' x)
 -- circuit [x,y] == 'overlays' ['into' ('edge' x) ('edge' y), 'into' ('edge' y) ('edge' x)]
 -- @
@@ -313,7 +313,7 @@ circuit (x : xs) = overlays $ zipWith (\a b -> into (edge a) (edge b)) (x : xs) 
 -- given list.
 --
 -- @
--- clique []    == 'empty'
+-- clique []    == 'EdgeGraph.HigherKinded.Class.empty'
 -- clique [x]   == 'edge' x
 -- clique [x,y] == 'into' ('edge' x) ('edge' y)
 -- @
@@ -326,7 +326,7 @@ clique = intos . map edge
 -- lengths of the given lists.
 --
 -- @
--- biclique []  []  == 'empty'
+-- biclique []  []  == 'EdgeGraph.HigherKinded.Class.empty'
 -- biclique [x] []  == 'edge' x
 -- biclique []  [y] == 'edge' y
 -- @
@@ -341,7 +341,7 @@ biclique xs ys = into (edges xs) (edges ys)
 -- given list.
 --
 -- @
--- flower []      == 'empty'
+-- flower []      == 'EdgeGraph.HigherKinded.Class.empty'
 -- flower [x]     == 'into' ('edge' x) ('edge' x)
 -- flower [x,y]   == 'intos' ['edge' x, 'edge' y, 'edge' x]
 -- flower [x,y,z] == 'intos' ['edge' x, 'edge' y, 'edge' z, 'edge' x]
@@ -359,7 +359,7 @@ flower (x : xs) = intos (map edge (x : xs ++ [x]))
 -- lengths of the given lists.
 --
 -- @
--- node []  []    == 'empty'
+-- node []  []    == 'EdgeGraph.HigherKinded.Class.empty'
 -- node [x] []    == 'edge' x
 -- node []  [y]   == 'edge' y
 -- node [x] [y]   == 'into' ('edge' x) ('edge' y)
@@ -369,13 +369,13 @@ flower (x : xs) = intos (map edge (x : xs ++ [x]))
 node :: EdgeGraph g => [a] -> [a] -> g a
 node xs ys = pitss (map edge xs) `into` tipss (map edge ys)
 
--- | The /tree graph/ constructed from a given 'Tree' data structure.
+-- | The /tree graph/ constructed from a given 'Data.Tree.Tree' data structure.
 -- Complexity: /O(T)/ time, memory and size, where /T/ is the size of the
 -- given tree.
 tree :: EdgeGraph g => Tree a -> g a
 tree (Node x f) = overlay (into (edge x) (edges (map rootLabel f))) (forest f)
 
--- | The /forest graph/ constructed from a given 'Forest' data structure.
+-- | The /forest graph/ constructed from a given 'Data.Tree.Forest' data structure.
 -- Complexity: /O(F)/ time, memory and size, where /F/ is the size of the
 -- given forest.
 forest :: EdgeGraph g => Forest a -> g a
@@ -386,8 +386,8 @@ forest = overlays . map tree
 -- lengths of the given lists.
 --
 -- @
--- mesh xs     []   == 'empty'
--- mesh []     ys   == 'empty'
+-- mesh xs     []   == 'EdgeGraph.HigherKinded.Class.empty'
+-- mesh []     ys   == 'EdgeGraph.HigherKinded.Class.empty'
 -- mesh [x]    [y]  == 'edge' (x, y)
 -- @
 mesh :: EdgeGraph g => [a] -> [b] -> g (a, b)
@@ -398,8 +398,8 @@ mesh xs ys = path xs `box` path ys
 -- lengths of the given lists.
 --
 -- @
--- torus xs     []   == 'empty'
--- torus []     ys   == 'empty'
+-- torus xs     []   == 'EdgeGraph.HigherKinded.Class.empty'
+-- torus []     ys   == 'EdgeGraph.HigherKinded.Class.empty'
 -- @
 torus :: EdgeGraph g => [a] -> [b] -> g (a, b)
 torus xs ys = circuit xs `box` circuit ys
@@ -410,7 +410,7 @@ torus xs ys = circuit xs `box` circuit ys
 -- alphabet and /D/ is the dimension of the graph.
 --
 -- @
--- deBruijn k [] == 'empty'
+-- deBruijn k [] == 'EdgeGraph.HigherKinded.Class.empty'
 -- @
 deBruijn :: EdgeGraph g => Int -> [a] -> g [a]
 deBruijn len alphabet = skeleton >>= expand
@@ -423,7 +423,7 @@ deBruijn len alphabet = skeleton >>= expand
 -- Complexity: /O(s)/ time, memory and size.
 --
 -- @
--- removeEdge x ('edge' x)     == 'empty'
+-- removeEdge x ('edge' x)     == 'EdgeGraph.HigherKinded.Class.empty'
 -- removeEdge x . removeEdge x == removeEdge x
 -- @
 removeEdge :: (Eq a, EdgeGraph g) => a -> g a -> g a
@@ -472,7 +472,7 @@ splitEdge v us g = g >>= \w -> if w == v then edges us else edge w
 --
 -- @
 -- induce (const True)  x == x
--- induce (const False) x == 'empty'
+-- induce (const False) x == 'EdgeGraph.HigherKinded.Class.empty'
 -- induce (/= x)          == 'removeEdge' x
 -- induce p . induce q    == induce (\\x -> p x && q x)
 -- @
@@ -489,7 +489,7 @@ induce = mfilter
 -- @
 -- Up to an isomorphism between the resulting edge types, this operation
 -- is /commutative/, /associative/, /distributes/ over 'overlay', has singleton
--- graphs as /identities/ and 'empty' as the /annihilating zero/. Below @~~@
+-- graphs as /identities/ and 'EdgeGraph.HigherKinded.Class.empty' as the /annihilating zero/. Below @~~@
 -- stands for the equality up to an isomorphism, e.g. @(x, ()) ~~ x@.
 --
 -- @
@@ -497,7 +497,7 @@ induce = mfilter
 -- box x (box y z)       ~~ box (box x y) z
 -- box x ('overlay' y z) == 'overlay' (box x y) (box x z)
 -- box x ('edge' ())     ~~ x
--- box x 'empty'         ~~ 'empty'
+-- box x 'EdgeGraph.HigherKinded.Class.empty'         ~~ 'EdgeGraph.HigherKinded.Class.empty'
 -- @
 box :: EdgeGraph g => g a -> g b -> g (a, b)
 box x y = msum $ xs ++ ys

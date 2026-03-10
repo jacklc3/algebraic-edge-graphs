@@ -46,7 +46,7 @@ the following minimal set of axioms. In equations we use the infix operators
 '(+++)' for 'overlay', '(>+>)' for 'into', '(<+>)' for 'pits', and
 '(>+<)' for 'tips'.
 
-    * 'overlay' is commutative, associative, and idempotent with 'empty' as
+    * 'overlay' is commutative, associative, and idempotent with 'EdgeGraph.Class.empty' as
       the identity:
 
         >         x +++ y == y +++ x
@@ -54,7 +54,7 @@ the following minimal set of axioms. In equations we use the infix operators
         >         x +++ x == x
         >     x +++ empty == x
 
-    * 'empty' is the identity for 'into', 'pits', and 'tips':
+    * 'EdgeGraph.Class.empty' is the identity for 'into', 'pits', and 'tips':
 
         > empty >+> x == x
         > x >+> empty == x
@@ -201,7 +201,7 @@ instance (EdgeGraph g, EdgeGraph h, EdgeGraph i) => EdgeGraph (g, h, i) where
 -- given list.
 --
 -- @
--- edges []  == 'empty'
+-- edges []  == 'EdgeGraph.Class.empty'
 -- edges [x] == 'edge' x
 -- @
 edges :: EdgeGraph g => [Edge g] -> g
@@ -212,7 +212,7 @@ edges = overlays . map edge
 -- of the given list, and /S/ is the sum of sizes of the graphs in the list.
 --
 -- @
--- overlays []    == 'empty'
+-- overlays []    == 'EdgeGraph.Class.empty'
 -- overlays [x]   == x
 -- overlays [x,y] == 'overlay' x y
 -- @
@@ -224,7 +224,7 @@ overlays = foldr overlay empty
 -- of the given list, and /S/ is the sum of sizes of the graphs in the list.
 --
 -- @
--- intos []    == 'empty'
+-- intos []    == 'EdgeGraph.Class.empty'
 -- intos [x]   == x
 -- intos [x,y] == 'into' x y
 -- @
@@ -249,8 +249,8 @@ tipss = foldr tips empty
 -- a particular graph instance.
 --
 -- @
--- isSubgraphOf 'empty'    x               == True
--- isSubgraphOf ('edge' x) 'empty'         == False
+-- isSubgraphOf 'EdgeGraph.Class.empty'    x               == True
+-- isSubgraphOf ('edge' x) 'EdgeGraph.Class.empty'         == False
 -- isSubgraphOf x          ('overlay' x y) == True
 -- @
 isSubgraphOf :: (EdgeGraph g, Eq g) => g -> g -> Bool
@@ -261,7 +261,7 @@ isSubgraphOf x y = overlay x y == y
 -- given list.
 --
 -- @
--- path []      == 'empty'
+-- path []      == 'EdgeGraph.Class.empty'
 -- path [x]     == 'edge' x
 -- path [x,y]   == 'into' ('edge' x) ('edge' y)
 -- path [x,y,z] == 'overlays' ['into' ('edge' x) ('edge' y), 'into' ('edge' y) ('edge' z)]
@@ -277,7 +277,7 @@ path xs  = overlays $ zipWith (\a b -> into (edge a) (edge b)) xs (drop 1 xs)
 -- given list.
 --
 -- @
--- circuit []    == 'empty'
+-- circuit []    == 'EdgeGraph.Class.empty'
 -- circuit [x]   == 'into' ('edge' x) ('edge' x)
 -- circuit [x,y] == 'overlays' ['into' ('edge' x) ('edge' y), 'into' ('edge' y) ('edge' x)]
 -- @
@@ -291,7 +291,7 @@ circuit (x : xs) = overlays $ zipWith (\a b -> into (edge a) (edge b)) (x : xs) 
 -- given list.
 --
 -- @
--- clique []    == 'empty'
+-- clique []    == 'EdgeGraph.Class.empty'
 -- clique [x]   == 'edge' x
 -- clique [x,y] == 'into' ('edge' x) ('edge' y)
 -- @
@@ -304,7 +304,7 @@ clique = intos . map edge
 -- lengths of the given lists.
 --
 -- @
--- biclique []  []  == 'empty'
+-- biclique []  []  == 'EdgeGraph.Class.empty'
 -- biclique [x] []  == 'edge' x
 -- biclique []  [y] == 'edge' y
 -- @
@@ -319,7 +319,7 @@ biclique xs ys = into (edges xs) (edges ys)
 -- given list.
 --
 -- @
--- flower []      == 'empty'
+-- flower []      == 'EdgeGraph.Class.empty'
 -- flower [x]     == 'into' ('edge' x) ('edge' x)
 -- flower [x,y]   == 'intos' ['edge' x, 'edge' y, 'edge' x]
 -- flower [x,y,z] == 'intos' ['edge' x, 'edge' y, 'edge' z, 'edge' x]
@@ -337,7 +337,7 @@ flower (x : xs) = intos (map edge (x : xs ++ [x]))
 -- lengths of the given lists.
 --
 -- @
--- node []  []    == 'empty'
+-- node []  []    == 'EdgeGraph.Class.empty'
 -- node [x] []    == 'edge' x
 -- node []  [y]   == 'edge' y
 -- node [x] [y]   == 'into' ('edge' x) ('edge' y)

@@ -6,10 +6,10 @@
 -- Maintainer : jackliellcock@gmail.com
 -- Stability  : experimental
 --
--- This module defines the 'AdjacencyMap' data type as an edge-indexed
+-- This module defines the t'AdjacencyMap' data type as an edge-indexed
 -- adjacency map for algebraic edge graphs. Each edge maps to an
--- 'Adjacency' record describing its neighbourhood (forks, joins,
--- predecessors, successors). 'AdjacencyMap' is an instance of the
+-- t'Adjacency' record describing its neighbourhood (forks, joins,
+-- predecessors, successors). t'AdjacencyMap' is an instance of the
 -- 'C.EdgeGraph' type class, which can be used for polymorphic graph
 -- construction and manipulation.
 --
@@ -104,7 +104,7 @@ forest :: Ord a => Forest a -> AdjacencyMap a
 forest = C.forest
 
 -- | The function @replaceEdge u v@ replaces edge @u@ with edge
--- label @v@ in a given 'AdjacencyMap'. If @v@ already exists, @u@ and @v@
+-- label @v@ in a given t'AdjacencyMap'. If @v@ already exists, @u@ and @v@
 -- will be merged.
 replaceEdge :: Ord a => a -> a -> AdjacencyMap a -> AdjacencyMap a
 replaceEdge u v = gmap $ \w -> if w == u then v else w
@@ -122,9 +122,9 @@ edgeIntSet = IntSet.fromDistinctAscList . Map.keys . adjacencyMap
 -- i.e. the edges that the given edge flows into.
 --
 -- @
--- postset x 'empty'                        == Set.'Set.empty'
--- postset x ('edge' x)                     == Set.'Set.empty'
--- postset 1 ('into' ('edge' 1) ('edge' 2)) == Set.'Set.singleton' 2
+-- postset x 'EdgeGraph.AdjacencyMap.empty'                        == Set.'Set.empty'
+-- postset x ('EdgeGraph.AdjacencyMap.edge' x)                     == Set.'Set.empty'
+-- postset 1 ('into' ('EdgeGraph.AdjacencyMap.edge' 1) ('EdgeGraph.AdjacencyMap.edge' 2)) == Set.'Set.singleton' 2
 -- @
 postset :: Ord a => a -> AdjacencyMap a -> Set a
 postset a (AdjacencyMap m) = maybe Set.empty succs (Map.lookup a m)
@@ -134,9 +134,9 @@ postset a (AdjacencyMap m) = maybe Set.empty succs (Map.lookup a m)
 -- i.e. the edges that flow into the given edge.
 --
 -- @
--- preset x 'empty'                        == Set.'Set.empty'
--- preset x ('edge' x)                     == Set.'Set.empty'
--- preset 2 ('into' ('edge' 1) ('edge' 2)) == Set.'Set.singleton' 1
+-- preset x 'EdgeGraph.AdjacencyMap.empty'                        == Set.'Set.empty'
+-- preset x ('EdgeGraph.AdjacencyMap.edge' x)                     == Set.'Set.empty'
+-- preset 2 ('into' ('EdgeGraph.AdjacencyMap.edge' 1) ('EdgeGraph.AdjacencyMap.edge' 2)) == Set.'Set.singleton' 1
 -- @
 preset :: Ord a => a -> AdjacencyMap a -> Set a
 preset a (AdjacencyMap m) = maybe Set.empty preds (Map.lookup a m)
@@ -153,8 +153,8 @@ graphKL (AdjacencyMap m) = (g, \u -> case r u of (_, v, _) -> v)
 -- directed flow from each edge to its successors.
 --
 -- @
--- 'dfsForest' 'empty'                         == []
--- 'dfsForest' ('edge' x)                      == [Node x []]
+-- 'dfsForest' 'EdgeGraph.AdjacencyMap.empty'                         == []
+-- 'dfsForest' ('EdgeGraph.AdjacencyMap.edge' x)                      == [Node x []]
 -- 'isSubgraphOf' ('forest' $ 'dfsForest' x) x == True
 -- 'dfsForest' . 'forest' . 'dfsForest'        == 'dfsForest'
 -- @
@@ -169,7 +169,7 @@ dfsForest m = let (g, r) = graphKL m in fmap (fmap r) (KL.dff g)
 -- @
 -- 'topSort' ('path' [1, 2, 3]) == Just [1, 2, 3]
 -- 'topSort' ('circuit' [1, 2]) == Nothing
--- 'topSort' ('edge' x)         == Just [x]
+-- 'topSort' ('EdgeGraph.AdjacencyMap.edge' x)         == Just [x]
 -- @
 topSort :: Ord a => AdjacencyMap a -> Maybe [a]
 topSort m = if isTopSort result m then Just result else Nothing
@@ -182,9 +182,9 @@ topSort m = if isTopSort result m then Just result else Nothing
 -- and no edge appears after one of its successors.
 --
 -- @
--- 'isTopSort' [] 'empty'     == True
--- 'isTopSort' [x] ('edge' x) == True
--- 'isTopSort' [] ('edge' x)  == False
+-- 'isTopSort' [] 'EdgeGraph.AdjacencyMap.empty'     == True
+-- 'isTopSort' [x] ('EdgeGraph.AdjacencyMap.edge' x) == True
+-- 'isTopSort' [] ('EdgeGraph.AdjacencyMap.edge' x)  == False
 -- @
 isTopSort :: Ord a => [a] -> AdjacencyMap a -> Bool
 isTopSort xs m = go Set.empty xs
@@ -198,9 +198,9 @@ isTopSort xs m = go Set.empty xs
 -- Edges that form directed cycles are grouped into the same component.
 --
 -- @
--- 'scc' 'empty'                          == 'empty'
--- 'scc' ('edge' x)                       == 'edge' (Set.'Set.singleton' x)
--- 'scc' ('circuit' (1:xs))               == 'edge' (Set.'Set.fromList' (1:xs))
+-- 'scc' 'EdgeGraph.AdjacencyMap.empty'                          == 'EdgeGraph.AdjacencyMap.empty'
+-- 'scc' ('EdgeGraph.AdjacencyMap.edge' x)                       == 'EdgeGraph.AdjacencyMap.edge' (Set.'Set.singleton' x)
+-- 'scc' ('circuit' (1:xs))               == 'EdgeGraph.AdjacencyMap.edge' (Set.'Set.fromList' (1:xs))
 -- 'edgeCount' ('scc' x) >= 'edgeCount' x == False
 -- @
 scc :: Ord a => AdjacencyMap a -> AdjacencyMap (Set a)

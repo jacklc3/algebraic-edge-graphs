@@ -42,7 +42,7 @@ import qualified Data.Map.Strict    as Map
 import qualified EdgeGraph.Class    as C
 import qualified Data.Set           as Set
 
--- | A 'Node' represents an implicit vertex in an edge-indexed graph.
+-- | A t'Node' represents an implicit vertex in an edge-indexed graph.
 -- It has a set of incoming edges ('nodeTips') and a set of outgoing
 -- edges ('nodePits'). A node may have empty tips (making it a source
 -- node) or empty pits (making it a sink node), but not both empty.
@@ -56,14 +56,14 @@ data Node a = Node {
 instance (Ord a, Show a) => Show (Node a) where
   show (Node ts ps) = "Node " ++ show (Set.toAscList ts) ++ " " ++ show (Set.toAscList ps)
 
--- | The 'Incidence' data type represents an edge-indexed graph as a flow
+-- | The t'Incidence' data type represents an edge-indexed graph as a flow
 -- representation: a set of nodes where each edge appears in exactly one
 -- node's tips and exactly one node's pits. This is the canonical representation
 -- for algebraic edge graphs.
 --
 -- The 'Eq' instance satisfies all axioms of algebraic edge graphs.
 newtype Incidence a = Incidence {
-  -- | The set of 'Node's in the flow representation.
+  -- | The set of t'Node's in the flow representation.
   nodes :: Set (Node a)
 } deriving Eq
 
@@ -113,7 +113,7 @@ instance Ord a => C.EdgeGraph (Incidence a) where
 -- 4. The union of all tips equals the union of all pits (same edge set)
 --
 -- @
--- consistent 'empty'         == True
+-- consistent 'EdgeGraph.Incidence.Internal.empty'         == True
 -- consistent ('edge' x)      == True
 -- consistent ('overlay' x y) == True
 -- consistent ('into' x y)    == True
@@ -216,8 +216,8 @@ edge a = Incidence $ Set.fromList
 --
 -- @
 -- 'isEmpty' ('overlay' x y)   == 'isEmpty' x && 'isEmpty' y
--- 'overlay' 'empty' x         == x
--- 'overlay' x 'empty'         == x
+-- 'overlay' 'EdgeGraph.Incidence.Internal.empty' x         == x
+-- 'overlay' x 'EdgeGraph.Incidence.Internal.empty'         == x
 -- 'overlay' x y               == 'overlay' y x
 -- 'overlay' x ('overlay' y z) == 'overlay' ('overlay' x y) z
 -- 'overlay' x x               == x
@@ -242,8 +242,8 @@ ci d e
 --
 -- @
 -- 'isEmpty' ('into' x y)       == 'isEmpty' x && 'isEmpty' y
--- 'into' 'empty' x             == x
--- 'into' x 'empty'             == x
+-- 'into' 'EdgeGraph.Incidence.Internal.empty' x             == x
+-- 'into' x 'EdgeGraph.Incidence.Internal.empty'             == x
 -- 'into' ('edge' x) ('edge' y) /= 'overlay' ('edge' x) ('edge' y)
 -- @
 into :: Ord a => Incidence a -> Incidence a -> Incidence a
@@ -304,7 +304,7 @@ tips x y = Incidence $ normalize allNodes
 -- Complexity: /O(L^2 * log(L))/ time and /O(L)/ memory.
 --
 -- @
--- edges []    == 'empty'
+-- edges []    == 'EdgeGraph.Incidence.Internal.empty'
 -- edges [x]   == 'edge' x
 -- @
 edges :: Ord a => [a] -> Incidence a
@@ -323,7 +323,7 @@ fromNodeList = Incidence . normalize
 -- Complexity: /O(L^2 * m)/ time and /O(L)/ memory.
 --
 -- @
--- fromIncidenceList []                  == 'empty'
+-- fromIncidenceList []                  == 'EdgeGraph.Incidence.Internal.empty'
 -- fromIncidenceList [([],[x]),([x],[])] == 'edge' x
 -- @
 fromIncidenceList :: Ord a => [([a], [a])] -> Incidence a
@@ -372,7 +372,7 @@ hasEdge a = Set.member a . edgeSet
 -- Complexity: /O(n * log(n))/ time.
 --
 -- @
--- removeEdge x ('edge' x) == 'empty'
+-- removeEdge x ('edge' x) == 'EdgeGraph.Incidence.Internal.empty'
 -- @
 removeEdge :: Ord a => a -> Incidence a -> Incidence a
 removeEdge x (Incidence ns) = Incidence $ Set.fromList
@@ -440,7 +440,7 @@ detachTip a r@(Incidence ns)
 -- Complexity: /O(n^2 * m * log(m))/ time.
 --
 -- @
--- gmap f 'empty'    == 'empty'
+-- gmap f 'EdgeGraph.Incidence.Internal.empty'    == 'EdgeGraph.Incidence.Internal.empty'
 -- gmap f ('edge' x) == 'edge' (f x)
 -- gmap id           == id
 -- gmap f . gmap g   == gmap (f . g)
@@ -456,7 +456,7 @@ gmap f (Incidence ns) = Incidence $ normalize $ map mapNode $ Set.toList ns
 --
 -- @
 -- induce (const True)  x == x
--- induce (const False) x == 'empty'
+-- induce (const False) x == 'EdgeGraph.Incidence.Internal.empty'
 -- @
 induce :: Ord a => (a -> Bool) -> Incidence a -> Incidence a
 induce p (Incidence ns) = Incidence $ Set.fromList
