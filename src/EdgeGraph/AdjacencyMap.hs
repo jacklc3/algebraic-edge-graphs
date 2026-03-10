@@ -15,35 +15,35 @@
 --
 -----------------------------------------------------------------------------
 module EdgeGraph.AdjacencyMap (
-    -- * Data structure
-    AdjacencyMap, Adjacency (..),
+  -- * Data structure
+  AdjacencyMap, Adjacency (..),
 
-    -- * Conversion
-    toIncidence, fromIncidence,
+  -- * Conversion
+  toIncidence, fromIncidence,
 
-    -- * Basic graph construction primitives
-    empty, edge, overlay, into, pits, tips, edges, fromNodeList, fromIncidenceList,
-    overlays, intos,
+  -- * Basic graph construction primitives
+  empty, edge, overlay, into, pits, tips, edges, fromNodeList, fromIncidenceList,
+  overlays, intos,
 
-    -- * Comparisons
-    isSubgraphOf,
+  -- * Comparisons
+  isSubgraphOf,
 
-    -- * Graph properties
-    isEmpty, hasEdge, edgeCount, nodeCount,
-    edgeList, adjacencyList, nodeList, edgeSet, nodeSet, edgeIntSet,
+  -- * Graph properties
+  isEmpty, hasEdge, edgeCount, nodeCount,
+  edgeList, adjacencyList, nodeList, edgeSet, nodeSet, edgeIntSet,
 
-    -- * Graph queries
-    postset, preset,
+  -- * Graph queries
+  postset, preset,
 
-    -- * Standard families of graphs
-    path, circuit, clique, biclique, flower, node, tree, forest,
+  -- * Standard families of graphs
+  path, circuit, clique, biclique, flower, node, tree, forest,
 
-    -- * Graph transformation
-    replaceEdge, mergeEdges, detachPit, detachTip, gmap, induce,
+  -- * Graph transformation
+  replaceEdge, mergeEdges, detachPit, detachTip, gmap, induce,
 
-    -- * Graph algorithms
-    dfsForest, topSort, isTopSort, scc
-  ) where
+  -- * Graph algorithms
+  dfsForest, topSort, isTopSort, scc
+) where
 
 import Data.Foldable (toList)
 import Data.Set (Set)
@@ -51,11 +51,11 @@ import Data.Tree
 
 import EdgeGraph.AdjacencyMap.Internal
 
-import qualified Data.Graph          as KL
-import qualified Data.IntSet         as IntSet
-import qualified Data.Map.Strict     as Map
-import qualified Data.Set            as Set
-import qualified EdgeGraph.Class     as C
+import qualified Data.Graph      as KL
+import qualified Data.IntSet     as IntSet
+import qualified Data.Map.Strict as Map
+import qualified Data.Set        as Set
+import qualified EdgeGraph.Class as C
 
 -- | Overlay a given list of graphs.
 overlays :: Ord a => [AdjacencyMap a] -> AdjacencyMap a

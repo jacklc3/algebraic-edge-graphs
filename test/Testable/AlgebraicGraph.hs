@@ -53,11 +53,11 @@ testSizeGroup = do
 testFoldgGroup :: forall g. TestableAlgebraicGraph g => IO ()
 testFoldgGroup = do
   putStrLn "\n============ foldg ============"
-  test "foldg empty edge overlay into pits tips == id" $ sizeLimit $ \(x :: g) ->
+  test "foldg empty edge overlay into pits tips       == id" $ sizeLimit $ \(x :: g) ->
         foldg empty edge overlay into pits tips x == x
-  test "foldg [] return (++) (++) (++) (++) == toList" $ sizeLimit $ \(x :: g) ->
+  test "foldg [] return (++) (++) (++) (++)           == toList" $ sizeLimit $ \(x :: g) ->
         foldg [] return (++) (++) (++) (++) x == toEdgeList x
-  test "foldg 1 (const 1) (+) (+) (+) (+) == size" $ sizeLimit $ \(x :: g) ->
+  test "foldg 1 (const 1) (+) (+) (+) (+)             == size" $ sizeLimit $ \(x :: g) ->
         foldg 1 (const 1) (+) (+) (+) (+) x == size x
   test "foldg True  (const False) (&&) (&&) (&&) (&&) == isEmpty" $ sizeLimit $ \(x :: g) ->
         foldg True (const False) (&&) (&&) (&&) (&&) x == isEmpty x

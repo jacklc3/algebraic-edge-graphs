@@ -18,33 +18,33 @@
 -- class is not higher-kinded and permits more instances.
 -----------------------------------------------------------------------------
 module EdgeGraph.HigherKinded.Class (
-    -- * The core type class
-    EdgeGraph (..), empty, edge, overlay,
+  -- * The core type class
+  EdgeGraph (..), empty, edge, overlay,
 
-    -- * Basic graph construction primitives
-    edges, overlays, intos, pitss, tipss,
+  -- * Basic graph construction primitives
+  edges, overlays, intos, pitss, tipss,
 
-    -- * Comparisons
-    isSubgraphOf,
+  -- * Comparisons
+  isSubgraphOf,
 
-    -- * Graph properties
-    isEmpty, hasEdge, edgeCount, edgeList, edgeSet,
-    edgeIntSet,
+  -- * Graph properties
+  isEmpty, hasEdge, edgeCount, edgeList, edgeSet,
+  edgeIntSet,
 
-    -- * Standard families of graphs
-    path, circuit, clique, biclique, flower, node, tree, forest, mesh, torus, deBruijn,
+  -- * Standard families of graphs
+  path, circuit, clique, biclique, flower, node, tree, forest, mesh, torus, deBruijn,
 
-    -- * Graph transformation
-    removeEdge, replaceEdge, mergeEdges, splitEdge,
-    induce,
+  -- * Graph transformation
+  removeEdge, replaceEdge, mergeEdges, splitEdge,
+  induce,
 
-    -- * Graph composition
-    box,
+  -- * Graph composition
+  box,
 
-    -- * Conversion between graph data types
-    ToEdgeGraph (..)
+  -- * Conversion between graph data types
+  ToEdgeGraph (..)
 
-  ) where
+) where
 
 import Control.Applicative (empty, (<|>))
 import Control.Monad
@@ -206,9 +206,9 @@ tipss = foldr tips empty
 -- a particular graph instance.
 --
 -- @
--- isSubgraphOf 'empty'         x             == True
--- isSubgraphOf ('edge' x)      'empty'         == False
--- isSubgraphOf x             ('overlay' x y) == True
+-- isSubgraphOf 'empty'    x               == True
+-- isSubgraphOf ('edge' x) 'empty'         == False
+-- isSubgraphOf x          ('overlay' x y) == True
 -- @
 isSubgraphOf :: (EdgeGraph g, Eq (g a)) => g a -> g a -> Bool
 isSubgraphOf x y = overlay x y == y
@@ -217,9 +217,9 @@ isSubgraphOf x y = overlay x y == y
 -- Complexity: /O(s)/ time.
 --
 -- @
--- isEmpty 'empty'                       == True
--- isEmpty ('overlay' 'empty' 'empty')       == True
--- isEmpty ('edge' x)                    == False
+-- isEmpty 'empty'                     == True
+-- isEmpty ('overlay' 'empty' 'empty') == True
+-- isEmpty ('edge' x)                  == False
 -- isEmpty ('removeEdge' x $ 'edge' x) == True
 -- @
 isEmpty :: EdgeGraph g => g a -> Bool
@@ -229,8 +229,8 @@ isEmpty = null
 -- Complexity: /O(s)/ time.
 --
 -- @
--- hasEdge x 'empty'              == False
--- hasEdge x ('edge' x)           == True
+-- hasEdge x 'empty'          == False
+-- hasEdge x ('edge' x)       == True
 -- hasEdge x . 'removeEdge' x == const False
 -- @
 hasEdge :: (Eq a, EdgeGraph g) => a -> g a -> Bool
@@ -242,7 +242,7 @@ hasEdge = elem
 -- @
 -- edgeCount 'empty'    == 0
 -- edgeCount ('edge' x) == 1
--- edgeCount          == 'length' . 'edgeList'
+-- edgeCount            == 'length' . 'edgeList'
 -- @
 edgeCount :: (Ord a, EdgeGraph g) => g a -> Int
 edgeCount = length . edgeList
@@ -261,8 +261,8 @@ edgeList = Set.toAscList . edgeSet
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeSet 'empty'      == Set.'Set.empty'
--- edgeSet . 'edge'     == Set.'Set.singleton'
+-- edgeSet 'empty'  == Set.'Set.empty'
+-- edgeSet . 'edge' == Set.'Set.singleton'
 -- @
 edgeSet :: (Ord a, EdgeGraph g) => g a -> Set.Set a
 edgeSet = foldr Set.insert Set.empty
@@ -272,8 +272,8 @@ edgeSet = foldr Set.insert Set.empty
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeIntSet 'empty'    == IntSet.'IntSet.empty'
--- edgeIntSet . 'edge'   == IntSet.'IntSet.singleton'
+-- edgeIntSet 'empty'  == IntSet.'IntSet.empty'
+-- edgeIntSet . 'edge' == IntSet.'IntSet.singleton'
 -- @
 edgeIntSet :: EdgeGraph g => g Int -> IntSet.IntSet
 edgeIntSet = foldr IntSet.insert IntSet.empty
@@ -410,7 +410,7 @@ torus xs ys = circuit xs `box` circuit ys
 -- alphabet and /D/ is the dimension of the graph.
 --
 -- @
--- deBruijn k []    == 'empty'
+-- deBruijn k [] == 'empty'
 -- @
 deBruijn :: EdgeGraph g => Int -> [a] -> g [a]
 deBruijn len alphabet = skeleton >>= expand
@@ -423,7 +423,7 @@ deBruijn len alphabet = skeleton >>= expand
 -- Complexity: /O(s)/ time, memory and size.
 --
 -- @
--- removeEdge x ('edge' x)           == 'empty'
+-- removeEdge x ('edge' x)     == 'empty'
 -- removeEdge x . removeEdge x == removeEdge x
 -- @
 removeEdge :: (Eq a, EdgeGraph g) => a -> g a -> g a
@@ -435,7 +435,7 @@ removeEdge v = induce (/= v)
 --
 -- @
 -- replaceEdge x x            == id
--- replaceEdge x y ('edge' x)   == 'edge' y
+-- replaceEdge x y ('edge' x) == 'edge' y
 -- replaceEdge x y            == 'mergeEdges' (== x) y
 -- @
 replaceEdge :: (Eq a, EdgeGraph g) => a -> a -> g a -> g a
@@ -458,9 +458,9 @@ mergeEdges p v = fmap $ \w -> if p w then v else w
 -- given list.
 --
 -- @
--- splitEdge x []             == 'removeEdge' x
--- splitEdge x [x]            == id
--- splitEdge x [y]            == 'replaceEdge' x y
+-- splitEdge x []  == 'removeEdge' x
+-- splitEdge x [x] == id
+-- splitEdge x [y] == 'replaceEdge' x y
 -- @
 splitEdge :: (Eq a, EdgeGraph g) => a -> [a] -> g a -> g a
 splitEdge v us g = g >>= \w -> if w == v then edges us else edge w
@@ -471,10 +471,10 @@ splitEdge v us g = g >>= \w -> if w == v then edges us else edge w
 -- /O(1)/ to be evaluated.
 --
 -- @
--- induce (const True)  x      == x
--- induce (const False) x      == 'empty'
--- induce (/= x)               == 'removeEdge' x
--- induce p . induce q     == induce (\\x -> p x && q x)
+-- induce (const True)  x == x
+-- induce (const False) x == 'empty'
+-- induce (/= x)          == 'removeEdge' x
+-- induce p . induce q    == induce (\\x -> p x && q x)
 -- @
 induce :: EdgeGraph g => (a -> Bool) -> g a -> g a
 induce = mfilter
@@ -493,8 +493,8 @@ induce = mfilter
 -- stands for the equality up to an isomorphism, e.g. @(x, ()) ~~ x@.
 --
 -- @
--- box x y             ~~ box y x
--- box x (box y z)     ~~ box (box x y) z
+-- box x y               ~~ box y x
+-- box x (box y z)       ~~ box (box x y) z
 -- box x ('overlay' y z) == 'overlay' (box x y) (box x z)
 -- box x ('edge' ())     ~~ x
 -- box x 'empty'         ~~ 'empty'
@@ -510,4 +510,4 @@ box x y = msum $ xs ++ ys
 -- semantically acts as the identity on graph data structures, but allows to
 -- convert graphs between different data representations.
 class ToEdgeGraph t where
-    toEdgeGraph :: EdgeGraph g => t a -> g a
+  toEdgeGraph :: EdgeGraph g => t a -> g a

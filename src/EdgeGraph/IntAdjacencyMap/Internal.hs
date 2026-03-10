@@ -33,10 +33,10 @@ import Data.IntSet (IntSet)
 import Data.Map.Strict (Map)
 import Data.Set (Set)
 
-import qualified Data.IntSet                 as IntSet
-import qualified Data.Map.Strict             as Map
-import qualified Data.Set                    as Set
-import qualified EdgeGraph.Class             as C
+import qualified Data.IntSet                  as IntSet
+import qualified Data.Map.Strict              as Map
+import qualified Data.Set                     as Set
+import qualified EdgeGraph.Class              as C
 import qualified EdgeGraph.Incidence.Internal as I
 
 -- | Neighbourhood information for a single Int edge.

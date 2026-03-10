@@ -58,7 +58,7 @@ instance TestableGraph (AM.AdjacencyMap Int) where
   edgeList    = AM.edgeList
   edgeSet     = AM.edgeSet
   edgeIntSet  = AM.edgeIntSet
-  removeEdge  x = AM.induce (/= x)
+  removeEdge  = \x -> AM.induce (/= x)
   replaceEdge = AM.replaceEdge
   gmap        = AM.gmap
   induce      = AM.induce
@@ -71,7 +71,7 @@ instance TestableGraph IAM.IntAdjacencyMap where
   edgeList    = IAM.edgeList
   edgeSet     = Set.fromList . IAM.edgeList
   edgeIntSet  = IAM.edgeIntSet
-  removeEdge  x = IAM.induce (/= x)
+  removeEdge  = \x -> IAM.induce (/= x)
   replaceEdge = IAM.replaceEdge
   gmap        = IAM.gmap
   induce      = IAM.induce
@@ -84,7 +84,7 @@ instance TestableGraph (I.Incidence Int) where
   edgeList    = I.edgeList
   edgeSet     = I.edgeSet
   edgeIntSet  = I.edgeIntSet
-  removeEdge  x = I.induce (/= x)
+  removeEdge  = \x -> I.induce (/= x)
   replaceEdge = I.replaceEdge
   gmap        = I.gmap
   induce      = I.induce

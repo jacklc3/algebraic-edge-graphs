@@ -9,7 +9,7 @@ import Testable.Instances ()
 import Arbitrary ()
 import qualified EdgeGraph.Fold as F
 
-type FO = F.Fold Int
+type G = F.Fold Int
 
 testFold :: IO ()
 testFold = do
@@ -17,42 +17,42 @@ testFold = do
 
   -- Type-specific: Show
   putStrLn "\n============ Show ============"
-  test "show (empty :: Fold Int) == \"empty\"" $
-        show (empty :: FO) == "empty"
+  test "show (empty :: Fold Int)  == \"empty\"" $
+        show (empty :: G) == "empty"
   test "show (edge 1 :: Fold Int) == \"edge 1\"" $
-        show (edge 1 :: FO) == "edge 1"
+        show (edge 1 :: G) == "edge 1"
 
   -- Shared test groups (TestableGraph)
-  testAxiomsGroup @FO
-  testEmptyGroup @FO
-  testEdgeGroup @FO
-  testOverlayGroup @FO
-  testIntoGroup @FO
-  testEdgesGroup @FO
-  testIsSubgraphOfGroup @FO
-  testIsEmptyGroup @FO
-  testHasEdgeGroup @FO
-  testEdgeCountGroup @FO
-  testNodeCountGroup @FO
-  testEdgeListGroup @FO
-  testEdgeSetGroup @FO
-  testEdgeIntSetGroup @FO
-  testPathGroup @FO
-  testCircuitGroup @FO
-  testCliqueGroup @FO
-  testBicliqueGroup @FO
-  testFlowerGroup @FO
-  testNodeGroup @FO
-  testRemoveEdgeGroup @FO
-  testReplaceEdgeGroup @FO
-  testGmapGroup @FO
-  testInduceGroup @FO
+  testAxiomsGroup @G
+  testEmptyGroup @G
+  testEdgeGroup @G
+  testOverlayGroup @G
+  testIntoGroup @G
+  testEdgesGroup @G
+  testIsSubgraphOfGroup @G
+  testIsEmptyGroup @G
+  testHasEdgeGroup @G
+  testEdgeCountGroup @G
+  testNodeCountGroup @G
+  testEdgeListGroup @G
+  testEdgeSetGroup @G
+  testEdgeIntSetGroup @G
+  testPathGroup @G
+  testCircuitGroup @G
+  testCliqueGroup @G
+  testBicliqueGroup @G
+  testFlowerGroup @G
+  testNodeGroup @G
+  testRemoveEdgeGroup @G
+  testReplaceEdgeGroup @G
+  testGmapGroup @G
+  testInduceGroup @G
 
   -- Shared test groups (TestableAlgebraicGraph)
-  testSizeGroup @FO
-  testFoldgGroup @FO
-  testMergeEdgesGroup @FO
-  testSplitEdgeGroup @FO
-  testTransposeGroup @FO
-  testSimplifyGroup @FO
-  testBindGroup @FO
+  testSizeGroup @G
+  testFoldgGroup @G
+  testMergeEdgesGroup @G
+  testSplitEdgeGroup @G
+  testTransposeGroup @G
+  testSimplifyGroup @G
+  testBindGroup @G

@@ -249,9 +249,9 @@ tipss = foldr tips empty
 -- a particular graph instance.
 --
 -- @
--- isSubgraphOf 'empty'         x             == True
--- isSubgraphOf ('edge' x)      'empty'         == False
--- isSubgraphOf x             ('overlay' x y) == True
+-- isSubgraphOf 'empty'    x               == True
+-- isSubgraphOf ('edge' x) 'empty'         == False
+-- isSubgraphOf x          ('overlay' x y) == True
 -- @
 isSubgraphOf :: (EdgeGraph g, Eq g) => g -> g -> Bool
 isSubgraphOf x y = overlay x y == y

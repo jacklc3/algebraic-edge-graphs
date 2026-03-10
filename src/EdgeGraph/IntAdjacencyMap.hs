@@ -156,5 +156,6 @@ isTopSort :: [Int] -> IntAdjacencyMap -> Bool
 isTopSort xs m = go Set.empty xs
   where
     go seen []     = seen == Set.fromList (edgeList m)
-    go seen (v:vs) = let newSeen = seen `seq` Set.insert v seen
-        in postset v m `Set.intersection` newSeen == Set.empty && go newSeen vs
+    go seen (v:vs) =
+      let newSeen = seen `seq` Set.insert v seen
+      in postset v m `Set.intersection` newSeen == Set.empty && go newSeen vs

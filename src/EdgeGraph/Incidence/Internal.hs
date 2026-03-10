@@ -37,10 +37,10 @@ module EdgeGraph.Incidence.Internal (
 
 import Data.Set (Set, union)
 
-import qualified Data.IntMap.Strict  as IntMap
-import qualified Data.Map.Strict     as Map
-import qualified EdgeGraph.Class as C
-import qualified Data.Set            as Set
+import qualified Data.IntMap.Strict as IntMap
+import qualified Data.Map.Strict    as Map
+import qualified EdgeGraph.Class    as C
+import qualified Data.Set           as Set
 
 -- | A 'Node' represents an implicit vertex in an edge-indexed graph.
 -- It has a set of incoming edges ('nodeTips') and a set of outgoing
@@ -75,7 +75,6 @@ instance (Ord a, Show a) => Show (Incidence a) where
       | otherwise    = "fromNodeList " ++ show (Set.toAscList ns)
     where
       nl = Set.toAscList ns
-      -- Check for a single edge: exactly two nodes forming a source-sink pair
       isSimpleEdge = Set.size ns == 2 &&
         case nl of
           [Node ts1 ps1, Node ts2 ps2] ->
@@ -216,12 +215,12 @@ edge a = Incidence $ Set.fromList
 -- Complexity: /O(n^2 * m)/ time.
 --
 -- @
--- 'isEmpty'     ('overlay' x y) == 'isEmpty' x && 'isEmpty' y
+-- 'isEmpty' ('overlay' x y)   == 'isEmpty' x && 'isEmpty' y
 -- 'overlay' 'empty' x         == x
 -- 'overlay' x 'empty'         == x
--- 'overlay' x y             == 'overlay' y x
+-- 'overlay' x y               == 'overlay' y x
 -- 'overlay' x ('overlay' y z) == 'overlay' ('overlay' x y) z
--- 'overlay' x x             == x
+-- 'overlay' x x               == x
 -- @
 overlay :: Ord a => Incidence a -> Incidence a -> Incidence a
 overlay (Incidence xs) (Incidence ys) =
@@ -242,9 +241,9 @@ ci d e
 -- Complexity: /O((n + |E_l| * |E_r|)^2 * m)/ time.
 --
 -- @
--- 'isEmpty' ('into' x y) == 'isEmpty' x && 'isEmpty' y
--- 'into' 'empty' x     == x
--- 'into' x 'empty'     == x
+-- 'isEmpty' ('into' x y)       == 'isEmpty' x && 'isEmpty' y
+-- 'into' 'empty' x             == x
+-- 'into' x 'empty'             == x
 -- 'into' ('edge' x) ('edge' y) /= 'overlay' ('edge' x) ('edge' y)
 -- @
 into :: Ord a => Incidence a -> Incidence a -> Incidence a
@@ -324,7 +323,7 @@ fromNodeList = Incidence . normalize
 -- Complexity: /O(L^2 * m)/ time and /O(L)/ memory.
 --
 -- @
--- fromIncidenceList []                == 'empty'
+-- fromIncidenceList []                  == 'empty'
 -- fromIncidenceList [([],[x]),([x],[])] == 'edge' x
 -- @
 fromIncidenceList :: Ord a => [([a], [a])] -> Incidence a
@@ -390,7 +389,7 @@ removeEdge x (Incidence ns) = Incidence $ Set.fromList
 -- Complexity: /O(n * log(n))/ time.
 --
 -- @
--- detachPit x ('edge' x)                    == 'edge' x
+-- detachPit x ('edge' x)                      == 'edge' x
 -- detachPit 2 ('into' ('edge' 1) ('edge' 2))  == 'edges' [1, 2]
 -- detachPit 1 ('pits' ('edge' 1) ('edge' 2))  == 'edges' [1, 2]
 -- @
@@ -416,7 +415,7 @@ detachPit a r@(Incidence ns)
 -- Complexity: /O(n * log(n))/ time.
 --
 -- @
--- detachTip x ('edge' x)                    == 'edge' x
+-- detachTip x ('edge' x)                      == 'edge' x
 -- detachTip 1 ('into' ('edge' 1) ('edge' 2))  == 'edges' [1, 2]
 -- detachTip 1 ('tips' ('edge' 1) ('edge' 2))  == 'edges' [1, 2]
 -- @

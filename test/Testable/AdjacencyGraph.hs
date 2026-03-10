@@ -53,9 +53,9 @@ testConsistentGroup = do
 testPostsetGroup :: forall g. TestableAdjacencyGraph g => IO ()
 testPostsetGroup = do
   putStrLn "\n============ postset ============"
-  test "postset x empty == Set.empty" $ \(x :: Edge g) ->
+  test "postset x empty                    == Set.empty" $ \(x :: Edge g) ->
         postset x (empty :: g) == Set.empty
-  test "postset x (edge x) == Set.empty" $ \(x :: Edge g) ->
+  test "postset x (edge x)                 == Set.empty" $ \(x :: Edge g) ->
         postset x (edge x :: g) == Set.empty
   test "postset 1 (into (edge 1) (edge 2)) == Set.singleton 2" $
         postset 1 (into (edge 1) (edge 2) :: g) == Set.singleton 2
@@ -63,9 +63,9 @@ testPostsetGroup = do
 testPresetGroup :: forall g. TestableAdjacencyGraph g => IO ()
 testPresetGroup = do
   putStrLn "\n============ preset ============"
-  test "preset x empty == Set.empty" $ \(x :: Edge g) ->
+  test "preset x empty                    == Set.empty" $ \(x :: Edge g) ->
         preset x (empty :: g) == Set.empty
-  test "preset x (edge x) == Set.empty" $ \(x :: Edge g) ->
+  test "preset x (edge x)                 == Set.empty" $ \(x :: Edge g) ->
         preset x (edge x :: g) == Set.empty
   test "preset 2 (into (edge 1) (edge 2)) == Set.singleton 1" $
         preset 2 (into (edge 1) (edge 2) :: g) == Set.singleton 1
@@ -73,27 +73,27 @@ testPresetGroup = do
 testDfsForestGroup :: forall g. TestableAdjacencyGraph g => IO ()
 testDfsForestGroup = do
   putStrLn "\n============ dfsForest ============"
-  test "dfsForest empty == []" $
+  test "dfsForest empty                       == []" $
         dfsForest (empty :: g) == []
-  test "dfsForest (edge x) == [Node x []]" $ \(x :: Edge g) ->
+  test "dfsForest (edge x)                    == [Node x []]" $ \(x :: Edge g) ->
         dfsForest (edge x :: g) == [Node x []]
-  test "dfsForest (path [1,2,3]) == [Node 1 [Node 2 [Node 3 []]]]" $
+  test "dfsForest (path [1,2,3])              == [Node 1 [Node 2 [Node 3 []]]]" $
         dfsForest (path [1,2,3] :: g) == [Node 1 [Node 2 [Node 3 []]]]
   test "isSubgraphOf (forest $ dfsForest x) x == True" $ sizeLimit $ \(x :: g) ->
         isSubgraphOf (forest $ dfsForest x) x == True
-  test "dfsForest . forest . dfsForest == dfsForest" $ sizeLimit $ \(x :: g) ->
+  test "dfsForest . forest . dfsForest        == dfsForest" $ sizeLimit $ \(x :: g) ->
         dfsForest (forest (dfsForest x) :: g) == dfsForest x
 
 testTopSortGroup :: forall g. TestableAdjacencyGraph g => IO ()
 testTopSortGroup = do
   putStrLn "\n============ topSort ============"
-  test "topSort (edge x) == Just [x]" $ \(x :: Edge g) ->
+  test "topSort (edge x)                    == Just [x]" $ \(x :: Edge g) ->
         topSort (edge x :: g) == Just [x]
-  test "topSort (into (edge 1) (edge 2)) == Just [1,2]" $
+  test "topSort (into (edge 1) (edge 2))    == Just [1,2]" $
         topSort (into (edge 1) (edge 2) :: g) == Just [1,2]
-  test "topSort (circuit [1,2]) == Nothing" $
+  test "topSort (circuit [1,2])             == Nothing" $
         topSort (circuit [1,2] :: g) == Nothing
-  test "topSort (path [1,2,3]) == Just [1,2,3]" $
+  test "topSort (path [1,2,3])              == Just [1,2,3]" $
         topSort (path [1,2,3] :: g) == Just [1,2,3]
   test "fmap (flip isTopSort x) (topSort x) /= Just False" $ sizeLimit $ \(x :: g) ->
         fmap (flip isTopSort x) (topSort x) /= Just False
@@ -101,17 +101,17 @@ testTopSortGroup = do
 testIsTopSortGroup :: forall g. TestableAdjacencyGraph g => IO ()
 testIsTopSortGroup = do
   putStrLn "\n============ isTopSort ============"
-  test "isTopSort [] empty == True" $
+  test "isTopSort [] empty     == True" $
         isTopSort [] (empty :: g) == True
   test "isTopSort [x] (edge x) == True" $ \(x :: Edge g) ->
         isTopSort [x] (edge x :: g) == True
-  test "isTopSort [] (edge x) == False" $ \(x :: Edge g) ->
+  test "isTopSort [] (edge x)  == False" $ \(x :: Edge g) ->
         isTopSort [] (edge x :: g) == False
 
 testDetachPitGroup :: forall g. TestableAdjacencyGraph g => IO ()
 testDetachPitGroup = do
   putStrLn "\n============ detachPit ============"
-  test "detachPit x (edge x) == edge x" $ \(x :: Edge g) ->
+  test "detachPit x (edge x)                 == edge x" $ \(x :: Edge g) ->
         detachPit x (edge x :: g) == (edge x :: g)
   test "detachPit 2 (into (edge 1) (edge 2)) == edges [1, 2]" $
         detachPit 2 (into (edge 1) (edge 2) :: g) == edges [1, 2]
@@ -125,7 +125,7 @@ testDetachPitGroup = do
 testDetachTipGroup :: forall g. TestableAdjacencyGraph g => IO ()
 testDetachTipGroup = do
   putStrLn "\n============ detachTip ============"
-  test "detachTip x (edge x) == edge x" $ \(x :: Edge g) ->
+  test "detachTip x (edge x)                 == edge x" $ \(x :: Edge g) ->
         detachTip x (edge x :: g) == (edge x :: g)
   test "detachTip 1 (into (edge 1) (edge 2)) == edges [1, 2]" $
         detachTip 1 (into (edge 1) (edge 2) :: g) == edges [1, 2]

@@ -40,8 +40,8 @@ module EdgeGraph.Incidence (
 import EdgeGraph.Incidence.Internal
 
 import qualified EdgeGraph.Class as C
-import qualified Data.IntSet         as IntSet
-import qualified Data.Tree           as Tree
+import qualified Data.IntSet     as IntSet
+import qualified Data.Tree       as Tree
 
 -- | The 'isSubgraphOf' function takes two incidences and returns 'True' if the
 -- first graph is a /subgraph/ of the second, i.e. @overlay x y == y@.

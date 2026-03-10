@@ -104,23 +104,24 @@ Note that 'size' is slightly different from the 'length' method of the
 'Foldable' type class, as the latter does not count 'Empty' leaves of the
 expression:
 
-@'length' 'empty'            == 0
-'size'   'empty'             == 1
-'length' ('edge' x)          == 1
-'size'   ('edge' x)          == 1
+@'length' 'empty'                == 0
+'size'   'empty'                 == 1
+'length' ('edge' x)              == 1
+'size'   ('edge' x)              == 1
 'length' ('empty' '+++' 'empty') == 0
 'size'   ('empty' '+++' 'empty') == 2@
 
 The 'size' of any graph is positive, and the difference @('size' g - 'length' g)@
 corresponds to the number of occurrences of 'empty' in an expression @g@.
 -}
-data EdgeGraph a = Empty
-                 | Edge a
-                 | EdgeGraph a :++: EdgeGraph a   -- ^ Overlay
-                 | EdgeGraph a :>>: EdgeGraph a   -- ^ Into
-                 | EdgeGraph a :<>: EdgeGraph a   -- ^ Pits
-                 | EdgeGraph a :><: EdgeGraph a   -- ^ Tips
-                 deriving (Foldable, Functor, Show, Traversable)
+data EdgeGraph a
+  = Empty
+  | Edge a
+  | EdgeGraph a :++: EdgeGraph a   -- ^ Overlay
+  | EdgeGraph a :>>: EdgeGraph a   -- ^ Into
+  | EdgeGraph a :<>: EdgeGraph a   -- ^ Pits
+  | EdgeGraph a :><: EdgeGraph a   -- ^ Tips
+  deriving (Foldable, Functor, Show, Traversable)
 
 infixl 6 :++:
 infixl 7 :>>:
@@ -128,44 +129,44 @@ infixl 7 :<>:
 infixl 7 :><:
 
 instance C.EdgeGraph (EdgeGraph a) where
-    type Edge (EdgeGraph a) = a
-    empty   = empty
-    edge    = edge
-    overlay = overlay
-    into    = into
-    pits    = pits
-    tips    = tips
+  type Edge (EdgeGraph a) = a
+  empty   = empty
+  edge    = edge
+  overlay = overlay
+  into    = into
+  pits    = pits
+  tips    = tips
 
 instance C.ToEdgeGraph (EdgeGraph a) where
-    type ToEdge (EdgeGraph a) = a
-    toEdgeGraph = foldg C.empty C.edge C.overlay C.into C.pits C.tips
+  type ToEdge (EdgeGraph a) = a
+  toEdgeGraph = foldg C.empty C.edge C.overlay C.into C.pits C.tips
 
 instance H.ToEdgeGraph EdgeGraph where
-    toEdgeGraph = foldg H.empty H.edge H.overlay H.into H.pits H.tips
+  toEdgeGraph = foldg H.empty H.edge H.overlay H.into H.pits H.tips
 
 instance H.EdgeGraph EdgeGraph where
-    into = (:>>:)
-    pits = (:<>:)
-    tips = (:><:)
+  into = (:>>:)
+  pits = (:<>:)
+  tips = (:><:)
 
 instance Ord a => Eq (EdgeGraph a) where
-    x == y = C.toEdgeGraph x == (C.toEdgeGraph y :: I.Incidence a)
+  x == y = C.toEdgeGraph x == (C.toEdgeGraph y :: I.Incidence a)
 
 instance Applicative EdgeGraph where
-    pure  = Edge
-    (<*>) = ap
+  pure  = Edge
+  (<*>) = ap
 
 instance Monad EdgeGraph where
-    return  = pure
-    g >>= f = foldg Empty f (:++:) (:>>:) (:<>:) (:><:) g
+  return  = pure
+  g >>= f = foldg Empty f (:++:) (:>>:) (:<>:) (:><:) g
 
 instance Alternative EdgeGraph where
-    empty = Empty
-    (<|>) = (:++:)
+  empty = Empty
+  (<|>) = (:++:)
 
 instance MonadPlus EdgeGraph where
-    mzero = Empty
-    mplus = (:++:)
+  mzero = Empty
+  mplus = (:++:)
 
 -- | Construct the /empty graph/. An alias for the constructor 'Empty'.
 -- Complexity: /O(1)/ time, memory and size.
@@ -196,8 +197,8 @@ edge = Edge
 -- Complexity: /O(1)/ time and memory, /O(s1 + s2)/ size.
 --
 -- @
--- 'isEmpty'   (overlay x y) == 'isEmpty' x   && 'isEmpty' y
--- 'size'      (overlay x y) == 'size' x      + 'size' y
+-- 'isEmpty' (overlay x y) == 'isEmpty' x && 'isEmpty' y
+-- 'size'    (overlay x y) == 'size' x + 'size' y
 -- @
 overlay :: EdgeGraph a -> EdgeGraph a -> EdgeGraph a
 overlay = (:++:)
@@ -209,8 +210,8 @@ overlay = (:++:)
 -- Complexity: /O(1)/ time and memory, /O(s1 + s2)/ size.
 --
 -- @
--- 'isEmpty'   (into x y) == 'isEmpty' x && 'isEmpty' y
--- 'size'      (into x y) == 'size' x    + 'size' y
+-- 'isEmpty' (into x y) == 'isEmpty' x && 'isEmpty' y
+-- 'size'    (into x y) == 'size' x + 'size' y
 -- @
 into :: EdgeGraph a -> EdgeGraph a -> EdgeGraph a
 into = (:>>:)
@@ -222,7 +223,7 @@ into = (:>>:)
 --
 -- @
 -- 'isEmpty' (pits x y) == 'isEmpty' x && 'isEmpty' y
--- 'size'    (pits x y) == 'size' x    + 'size' y
+-- 'size'    (pits x y) == 'size' x + 'size' y
 -- @
 pits :: EdgeGraph a -> EdgeGraph a -> EdgeGraph a
 pits = (:<>:)
@@ -234,7 +235,7 @@ pits = (:<>:)
 --
 -- @
 -- 'isEmpty' (tips x y) == 'isEmpty' x && 'isEmpty' y
--- 'size'    (tips x y) == 'size' x    + 'size' y
+-- 'size'    (tips x y) == 'size' x + 'size' y
 -- @
 tips :: EdgeGraph a -> EdgeGraph a -> EdgeGraph a
 tips = (:><:)
@@ -255,9 +256,9 @@ edges = C.edges
 -- of the given list, and /S/ is the sum of sizes of the graphs in the list.
 --
 -- @
--- overlays []    == 'empty'
--- overlays [x]   == x
--- overlays [x,y] == 'overlay' x y
+-- overlays []          == 'empty'
+-- overlays [x]         == x
+-- overlays [x,y]       == 'overlay' x y
 -- 'isEmpty' . overlays == 'all' 'isEmpty'
 -- @
 overlays :: [EdgeGraph a] -> EdgeGraph a
@@ -268,9 +269,9 @@ overlays = C.overlays
 -- of the given list, and /S/ is the sum of sizes of the graphs in the list.
 --
 -- @
--- intos []    == 'empty'
--- intos [x]   == x
--- intos [x,y] == 'into' x y
+-- intos []          == 'empty'
+-- intos [x]         == x
+-- intos [x,y]       == 'into' x y
 -- 'isEmpty' . intos == 'all' 'isEmpty'
 -- @
 intos :: [EdgeGraph a] -> EdgeGraph a
@@ -318,9 +319,9 @@ isSubgraphOf x y = I.isSubgraphOf (C.toEdgeGraph x) (C.toEdgeGraph y)
 -- Complexity: /O(s)/ time.
 --
 -- @
---                     x === x                         == True
---                     x === 'overlay' x 'empty'       == False
--- 'overlay' x y === 'overlay' x y                     == True
+--                               x === x                               == True
+--                               x === 'overlay' x 'empty'             == False
+--                   'overlay' x y === 'overlay' x y                   == True
 -- 'overlay' ('edge' 1) ('edge' 2) === 'overlay' ('edge' 2) ('edge' 1) == False
 -- @
 (===) :: Eq a => EdgeGraph a -> EdgeGraph a -> Bool
@@ -503,9 +504,9 @@ biclique = C.biclique
 -- given list.
 --
 -- @
--- flower []      == 'empty'
--- flower [x]     == 'into' ('edge' x) ('edge' x)
--- flower [x,y]   == 'intos' ['edge' x, 'edge' y, 'edge' x]
+-- flower []    == 'empty'
+-- flower [x]   == 'into' ('edge' x) ('edge' x)
+-- flower [x,y] == 'intos' ['edge' x, 'edge' y, 'edge' x]
 -- @
 flower :: [a] -> EdgeGraph a
 flower = C.flower
@@ -579,8 +580,8 @@ deBruijn = H.deBruijn
 -- Complexity: /O(s)/ time, memory and size.
 --
 -- @
--- removeEdge x ('edge' x)              == 'empty'
--- removeEdge x . removeEdge x   == removeEdge x
+-- removeEdge x ('edge' x)     == 'empty'
+-- removeEdge x . removeEdge x == removeEdge x
 -- @
 removeEdge :: Eq a => a -> EdgeGraph a -> EdgeGraph a
 removeEdge x = induce (/= x)
@@ -592,7 +593,7 @@ removeEdge x = induce (/= x)
 --
 -- @
 -- replaceEdge x x            == id
--- replaceEdge x y ('edge' x)   == 'edge' y
+-- replaceEdge x y ('edge' x) == 'edge' y
 -- replaceEdge x y            == 'mergeEdges' (== x) y
 -- @
 replaceEdge :: Eq a => a -> a -> EdgeGraph a -> EdgeGraph a
@@ -615,9 +616,9 @@ mergeEdges p v = fmap $ \w -> if p w then v else w
 -- given list.
 --
 -- @
--- splitEdge x []    == 'removeEdge' x
--- splitEdge x [x]   == id
--- splitEdge x [y]   == 'replaceEdge' x y
+-- splitEdge x []  == 'removeEdge' x
+-- splitEdge x [x] == id
+-- splitEdge x [y] == 'replaceEdge' x y
 -- @
 splitEdge :: Eq a => a -> [a] -> EdgeGraph a -> EdgeGraph a
 splitEdge v us g = g >>= \w -> if w == v then edges us else edge w
@@ -640,10 +641,10 @@ transpose = foldg Empty Edge (:++:) (flip (:>>:)) (:><:) (:<>:)
 -- /O(1)/ to be evaluated.
 --
 -- @
--- induce (const True)  x      == x
--- induce (const False) x      == 'empty'
--- induce (/= x)               == 'removeEdge' x
--- induce p . induce q     == induce (\\x -> p x && q x)
+-- induce (const True)  x        == x
+-- induce (const False) x        == 'empty'
+-- induce (/= x)                 == 'removeEdge' x
+-- induce p . induce q           == induce (\\x -> p x && q x)
 -- 'isSubgraphOf' (induce p x) x == True
 -- @
 induce :: (a -> Bool) -> EdgeGraph a -> EdgeGraph a
@@ -657,10 +658,10 @@ induce p = foldg Empty (\x -> if p x then Edge x else Empty) (:++:) (:>>:) (:<>:
 -- that the size of the result does not exceed the size of the given expression.
 --
 -- @
--- simplify x              == x
--- 'size' (simplify x)       <= 'size' x
--- simplify 'empty'         '===' 'empty'
--- simplify ('edge' 1)      '===' 'edge' 1
+-- simplify x                         ==    x
+-- 'size' (simplify x)                <=    'size' x
+-- simplify 'empty'                   '===' 'empty'
+-- simplify ('edge' 1)                '===' 'edge' 1
 -- simplify ('edge' 1 '+++' 'edge' 1) '===' 'edge' 1
 -- @
 simplify :: Ord a => EdgeGraph a -> EdgeGraph a

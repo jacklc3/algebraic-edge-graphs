@@ -100,10 +100,10 @@ Note that 'size' is slightly different from the 'length' method of the
 'Foldable' type class, as the latter does not count 'empty' leaves of the
 expression:
 
-@'length' 'empty'             == 0
-'size'   'empty'              == 1
-'length' ('edge' x)           == 1
-'size'   ('edge' x)           == 1
+@'length' 'empty'              == 0
+'size'   'empty'               == 1
+'length' ('edge' x)            == 1
+'size'   ('edge' x)            == 1
 'length' ('empty' +++ 'empty') == 0
 'size'   ('empty' +++ 'empty') == 2@
 
@@ -340,8 +340,8 @@ edgeList = I.edgeList . toIncidence
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeSet 'empty'      == Set.'Set.empty'
--- edgeSet . 'edge'     == Set.'Set.singleton'
+-- edgeSet 'empty'  == Set.'Set.empty'
+-- edgeSet . 'edge' == Set.'Set.singleton'
 -- @
 edgeSet :: Ord a => Fold a -> Set.Set a
 edgeSet = I.edgeSet . toIncidence
@@ -400,9 +400,9 @@ toIncidence = C.toEdgeGraph
 -- @
 mesh :: [a] -> [b] -> Fold (a, b)
 mesh xs ys = C.overlays
-    [ fmap (,b) (C.path (map fst ps)) | b <- ys, let ps = map (,b) xs ] `C.overlay`
-    C.overlays
-    [ fmap (a,) (C.path (map snd ps)) | a <- xs, let ps = map (a,) ys ]
+  [ fmap (,b) (C.path (map fst ps)) | b <- ys, let ps = map (,b) xs ] `C.overlay`
+  C.overlays
+  [ fmap (a,) (C.path (map snd ps)) | a <- xs, let ps = map (a,) ys ]
 
 -- | Construct a /torus graph/ from two lists of edges.
 -- Complexity: /O(L1 * L2)/ time, memory and size, where /L1/ and /L2/ are the
@@ -414,9 +414,9 @@ mesh xs ys = C.overlays
 -- @
 torus :: [a] -> [b] -> Fold (a, b)
 torus xs ys = C.overlays
-    [ fmap (,b) (C.circuit (map fst ps)) | b <- ys, let ps = map (,b) xs ] `C.overlay`
-    C.overlays
-    [ fmap (a,) (C.circuit (map snd ps)) | a <- xs, let ps = map (a,) ys ]
+  [ fmap (,b) (C.circuit (map fst ps)) | b <- ys, let ps = map (,b) xs ] `C.overlay`
+  C.overlays
+  [ fmap (a,) (C.circuit (map snd ps)) | a <- xs, let ps = map (a,) ys ]
 
 -- | Construct a /De Bruijn graph/ of given dimension and symbols of a given
 -- alphabet.
@@ -552,9 +552,9 @@ simplify = foldg C.empty C.edge (simple C.overlay) (simple C.into) (simple C.pit
 
 simple :: Eq g => (g -> g -> g) -> g -> g -> g
 simple op x y
-    | x == z    = x
-    | y == z    = y
-    | otherwise = z
+  | x == z    = x
+  | y == z    = y
+  | otherwise = z
   where
     z = op x y
 

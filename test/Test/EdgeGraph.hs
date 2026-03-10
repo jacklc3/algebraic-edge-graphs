@@ -53,11 +53,11 @@ testGraph = do
 
   -- Type-specific: structural equality
   putStrLn "\n============ (===) ============"
-  test "    x === x                  == True" $ sizeLimit $ \(x :: G) ->
+  test "    x === x                                             == True" $ sizeLimit $ \(x :: G) ->
            (x === x)                 == True
-  test "    x === overlay x empty    == False" $ sizeLimit $ \(x :: G) ->
+  test "    x === overlay x empty                               == False" $ sizeLimit $ \(x :: G) ->
            (x === overlay x empty)   == False
-  test "overlay x y === overlay x y  == True" $ sizeLimit $ \(x :: G) y ->
+  test "overlay x y === overlay x y                             == True" $ sizeLimit $ \(x :: G) y ->
        (overlay x y === overlay x y) == True
   test "overlay (edge 1) (edge 2) === overlay (edge 2) (edge 1) == False" $
        (overlay (edge 1) (edge 2) === overlay (edge 2) (edge (1 :: Int))) == False
