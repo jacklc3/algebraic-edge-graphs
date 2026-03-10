@@ -117,7 +117,7 @@ graphKL :: IntAdjacencyMap -> (KL.Graph, KL.Vertex -> Int)
 graphKL (IntAdjacencyMap m) = (g, \u -> case r u of (_, v, _) -> v)
   where
     (g, r) = KL.graphFromEdges'
-        [ ((), a, Set.toList (succs adj)) | (a, adj) <- Map.toList m ]
+      [ ((), a, Set.toList (succs adj)) | (a, adj) <- Map.toList m ]
 
 -- | Compute the /depth-first search/ forest of a graph.
 --

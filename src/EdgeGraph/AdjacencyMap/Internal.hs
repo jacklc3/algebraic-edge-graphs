@@ -118,9 +118,9 @@ fromIncidence (I.Incidence ns)
     -- Build maps: edge -> the node where it's in pits (source),
     --             edge -> the node where it's in tips (sink)
     sourceMap = Map.fromList
-        [ (a, n) | n <- nl, a <- Set.toList (I.nodePits n) ]
+      [ (a, n) | n <- nl, a <- Set.toList (I.nodePits n) ]
     sinkMap = Map.fromList
-        [ (a, n) | n <- nl, a <- Set.toList (I.nodeTips n) ]
+      [ (a, n) | n <- nl, a <- Set.toList (I.nodeTips n) ]
     allEdges = Map.keysSet sourceMap
     buildAdj a =
         let srcNode  = sourceMap Map.! a
@@ -336,22 +336,22 @@ removeEdge :: Ord a => a -> AdjacencyMap a -> AdjacencyMap a
 removeEdge x (AdjacencyMap m) = case Map.lookup x m of
     Nothing  -> AdjacencyMap m
     Just adj ->
-        let newForks = Set.delete x (forks adj)
-            newJoins = Set.delete x (joins adj)
-            m1 = Map.delete x m
-            m2 = Set.foldl' (\acc b ->
-              Map.adjust (\r -> r { forks = newForks }) b acc)
-              m1 newForks
-            m3 = Set.foldl' (\acc b ->
-              Map.adjust (\r -> r { joins = newJoins }) b acc)
-              m2 newJoins
-            m4 = Set.foldl' (\acc b ->
-              Map.adjust (\r -> r { succs = newForks }) b acc)
-              m3 (preds adj)
-            m5 = Set.foldl' (\acc b ->
-              Map.adjust (\r -> r { preds = newJoins }) b acc)
-              m4 (succs adj)
-        in AdjacencyMap m5
+      let newForks = Set.delete x (forks adj)
+          newJoins = Set.delete x (joins adj)
+          m1 = Map.delete x m
+          m2 = Set.foldl' (\acc b ->
+            Map.adjust (\r -> r { forks = newForks }) b acc)
+            m1 newForks
+          m3 = Set.foldl' (\acc b ->
+            Map.adjust (\r -> r { joins = newJoins }) b acc)
+            m2 newJoins
+          m4 = Set.foldl' (\acc b ->
+            Map.adjust (\r -> r { succs = newForks }) b acc)
+            m3 (preds adj)
+          m5 = Set.foldl' (\acc b ->
+            Map.adjust (\r -> r { preds = newJoins }) b acc)
+            m4 (succs adj)
+      in AdjacencyMap m5
 
 -- | Detach an edge from its source node. The edge gets a fresh source
 -- while any other edges sharing the original source node remain together.
@@ -371,11 +371,11 @@ detachPit a (AdjacencyMap m) = case Map.lookup a m of
         m1 = Map.adjust (\r -> r { forks = Set.singleton a
                                  , preds = Set.empty }) a m
         m2 = Set.foldl' (\acc b ->
-                Map.adjust (\r -> r { forks = Set.delete a (forks r) }) b acc)
-                m1 (Set.delete a oldForks)
+          Map.adjust (\r -> r { forks = Set.delete a (forks r) }) b acc)
+          m1 (Set.delete a oldForks)
         m3 = Set.foldl' (\acc b ->
-                Map.adjust (\r -> r { succs = Set.delete a (succs r) }) b acc)
-                m2 oldPreds
+          Map.adjust (\r -> r { succs = Set.delete a (succs r) }) b acc)
+          m2 oldPreds
     in AdjacencyMap m3
 
 -- | Detach an edge from its sink node. The edge gets a fresh sink
@@ -396,11 +396,11 @@ detachTip a (AdjacencyMap m) = case Map.lookup a m of
         m1 = Map.adjust (\r -> r { joins = Set.singleton a
                                  , succs = Set.empty }) a m
         m2 = Set.foldl' (\acc b ->
-                Map.adjust (\r -> r { joins = Set.delete a (joins r) }) b acc)
-                m1 (Set.delete a oldJoins)
-        m3 = Set.foldl' (\ac b ->
-                Map.adjust (\r -> r { preds = Set.delete a (preds r) }) b acc)
-                m2 oldSuccs
+          Map.adjust (\r -> r { joins = Set.delete a (joins r) }) b acc)
+          m1 (Set.delete a oldJoins)
+        m3 = Set.foldl' (\acc b ->
+          Map.adjust (\r -> r { preds = Set.delete a (preds r) }) b acc)
+          m2 oldSuccs
     in AdjacencyMap m3
 
 -- | Transform a graph by applying a function to each edge.

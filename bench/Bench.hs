@@ -80,23 +80,19 @@ main = defaultMain
     [ bench "10^0" $ nf elClique 1
     , bench "10^1" $ nf elClique 10
     , bench "10^2" $ nf elClique 100
-    , bench "10^3" $ nf elClique 1000
-    , bench "10^4" $ nf elClique 10000 ]
+    , bench "10^3" $ nf elClique 1000]
   , bgroup "ncClique"
     [ bench "10^0" $ nf ncClique 1
     , bench "10^1" $ nf ncClique 10
     , bench "10^2" $ nf ncClique 100
-    , bench "10^3" $ nf ncClique 1000
-    , bench "10^4" $ nf ncClique 10000 ]
+    , bench "10^3" $ nf ncClique 1000]
   , bgroup "lClique"
     [ bench "10^0" $ nf lClique 1
     , bench "10^1" $ nf lClique 10
     , bench "10^2" $ nf lClique 100
-    , bench "10^3" $ nf lClique 1000
-    , bench "10^4" $ nf lClique 10000 ]
+    , bench "10^3" $ nf lClique 1000]
   , bgroup "elIntClique"
     [ bench "10^0" $ nf elIntClique 1
     , bench "10^1" $ nf elIntClique 10
     , bench "10^2" $ nf elIntClique 100
-    , bench "10^3" $ nf elIntClique 1000
-    , bench "10^4" $ nf elIntClique 10000 ] ]
+    , bench "10^3" $ nf elIntClique 1000] ]

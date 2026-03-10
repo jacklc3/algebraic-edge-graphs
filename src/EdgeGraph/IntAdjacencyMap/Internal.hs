@@ -222,25 +222,21 @@ removeEdge :: Int -> IntAdjacencyMap -> IntAdjacencyMap
 removeEdge x (IntAdjacencyMap m) = case Map.lookup x m of
     Nothing  -> IntAdjacencyMap m
     Just adj ->
-        let xForks   = forks adj
-            xJoins   = joins adj
-            xPreds   = preds adj
-            xSuccs   = succs adj
-            newForks = Set.delete x xForks
-            newJoins = Set.delete x xJoins
+        let newForks = Set.delete x (forks adj)
+            newJoins = Set.delete x (joins adj)
             m1 = Map.delete x m
             m2 = Set.foldl' (\acc b ->
-                    Map.adjust (\r -> r { forks = newForks }) b acc)
-                    m1 newForks
+              Map.adjust (\r -> r { forks = newForks }) b acc)
+              m1 newForks
             m3 = Set.foldl' (\acc b ->
-                    Map.adjust (\r -> r { joins = newJoins }) b acc)
-                    m2 newJoins
+              Map.adjust (\r -> r { joins = newJoins }) b acc)
+              m2 newJoins
             m4 = Set.foldl' (\acc b ->
-                    Map.adjust (\r -> r { succs = newForks }) b acc)
-                    m3 xPreds
+              Map.adjust (\r -> r { succs = newForks }) b acc)
+              m3 (preds adj)
             m5 = Set.foldl' (\acc b ->
-                    Map.adjust (\r -> r { preds = newJoins }) b acc)
-                    m4 xSuccs
+              Map.adjust (\r -> r { preds = newJoins }) b acc)
+              m4 (succs adj)
         in IntAdjacencyMap m5
 
 detachPit :: Int -> IntAdjacencyMap -> IntAdjacencyMap
@@ -252,28 +248,28 @@ detachPit a (IntAdjacencyMap m) = case Map.lookup a m of
             m1 = Map.adjust (\r -> r { forks = Set.singleton a
                                      , preds = Set.empty }) a m
             m2 = Set.foldl' (\acc b ->
-                    Map.adjust (\r -> r { forks = Set.delete a (forks r) }) b acc)
-                    m1 (Set.delete a oldForks)
+              Map.adjust (\r -> r { forks = Set.delete a (forks r) }) b acc)
+              m1 (Set.delete a oldForks)
             m3 = Set.foldl' (\acc b ->
-                    Map.adjust (\r -> r { succs = Set.delete a (succs r) }) b acc)
-                    m2 oldPreds
+              Map.adjust (\r -> r { succs = Set.delete a (succs r) }) b acc)
+              m2 oldPreds
         in IntAdjacencyMap m3
 
 detachTip :: Int -> IntAdjacencyMap -> IntAdjacencyMap
 detachTip a (IntAdjacencyMap m) = case Map.lookup a m of
     Nothing  -> IntAdjacencyMap m
     Just adj ->
-        let oldJoins = joins adj
-            oldSuccs = succs adj
-            m1 = Map.adjust (\r -> r { joins = Set.singleton a
-                                     , succs = Set.empty }) a m
-            m2 = Set.foldl' (\acc b ->
-                    Map.adjust (\r -> r { joins = Set.delete a (joins r) }) b acc)
-                    m1 (Set.delete a oldJoins)
-            m3 = Set.foldl' (\acc b ->
-                    Map.adjust (\r -> r { preds = Set.delete a (preds r) }) b acc)
-                    m2 oldSuccs
-        in IntAdjacencyMap m3
+      let oldJoins = joins adj
+          oldSuccs = succs adj
+          m1 = Map.adjust (\r -> r { joins = Set.singleton a
+                                   , succs = Set.empty }) a m
+          m2 = Set.foldl' (\acc b ->
+            Map.adjust (\r -> r { joins = Set.delete a (joins r) }) b acc)
+            m1 (Set.delete a oldJoins)
+          m3 = Set.foldl' (\acc b ->
+            Map.adjust (\r -> r { preds = Set.delete a (preds r) }) b acc)
+            m2 oldSuccs
+      in IntAdjacencyMap m3
 
 gmap :: (Int -> Int) -> IntAdjacencyMap -> IntAdjacencyMap
 gmap f = fromIncidence . I.gmap f . toIncidence
@@ -281,8 +277,8 @@ gmap f = fromIncidence . I.gmap f . toIncidence
 induce :: (Int -> Bool) -> IntAdjacencyMap -> IntAdjacencyMap
 induce p (IntAdjacencyMap m) = IntAdjacencyMap $ Map.map updateAdj kept
   where
-    kept     = Map.filterWithKey (\k _ -> p k) m
-    keptKeys = Map.keysSet kept
+    kept          = Map.filterWithKey (\k _ -> p k) m
+    keptKeys      = Map.keysSet kept
     updateAdj adj = Adjacency
       { forks = Set.intersection (forks adj) keptKeys
       , joins = Set.intersection (joins adj) keptKeys
