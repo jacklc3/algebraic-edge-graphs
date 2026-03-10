@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module     : EdgeGraph.Incidence.Internal
@@ -35,6 +36,9 @@ module EdgeGraph.Incidence.Internal (
   removeEdge, detachPit, detachTip, gmap, induce
 ) where
 
+#if !MIN_VERSION_base(4,20,0)
+import Data.List (foldl')
+#endif
 import Data.Set (Set, union)
 
 import qualified Data.IntMap.Strict as IntMap
