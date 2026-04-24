@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 — 2026-04-24
+
+* Added reference to the theory in [this paper](https://jackliellcock.com/papers/edge_graphs/paper.pdf).
+* Fixed broken Haddock links throughout the documentation.
+* Tightened whitespace and alignment of formula blocks in module documentation for consistent rendering on Hackage.
+
 ## 0.1.0 — 2026-03-10
 
 * Initial release.

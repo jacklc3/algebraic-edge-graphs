@@ -15,8 +15,12 @@
 -- 'EdgeGraph' is an instance of the type class defined in "EdgeGraph.Class",
 -- which can be used for polymorphic edge graph construction and manipulation.
 --
--- The 'Eq' instance is implemented using the 'I.Incidence' as the /canonical
+-- The 'Eq' instance is implemented using the 'EdgeGraph.Incidence.Incidence' as the /canonical
 -- graph representation/ and satisfies all axioms of algebraic edge graphs.
+--
+-- See <https://jackliellcock.com/papers/edge_graphs/paper.pdf this paper> for
+-- the motivation behind the library and the underlying theory of algebraic
+-- edge graphs.
 --
 -----------------------------------------------------------------------------
 module EdgeGraph (
@@ -63,7 +67,7 @@ import qualified Data.Tree                    as Tree
 
 {-| The 'EdgeGraph' datatype is a deep embedding of the core edge graph
 construction primitives 'EdgeGraph.empty', 'EdgeGraph.edge', 'overlay', 'into', 'pits' and 'tips'.
-The 'Eq' instance is implemented using the 'I.Incidence' as the /canonical
+The 'Eq' instance is implemented using the 'EdgeGraph.Incidence.Incidence' as the /canonical
 graph representation/ and satisfies all axioms of algebraic edge graphs.
 In equations we use the infix operators '(EdgeGraph.Class.+++)' for 'overlay', '(EdgeGraph.Class.>+>)' for
 'into', '(EdgeGraph.Class.<+>)' for 'pits', and '(EdgeGraph.Class.>+<)' for 'tips'.
@@ -406,9 +410,9 @@ edgeList = Set.toAscList . edgeSet
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeSet 'EdgeGraph.empty'  == Set.'Set.empty'
--- edgeSet . 'EdgeGraph.edge' == Set.'Set.singleton'
--- edgeSet . 'edges'          == Set.'Set.fromList'
+-- edgeSet 'EdgeGraph.empty'  == 'Data.Set.empty'
+-- edgeSet . 'EdgeGraph.edge' == 'Data.Set.singleton'
+-- edgeSet . 'edges'          == 'Data.Set.fromList'
 -- @
 edgeSet :: Ord a => EdgeGraph a -> Set.Set a
 edgeSet = foldr Set.insert Set.empty
@@ -418,9 +422,9 @@ edgeSet = foldr Set.insert Set.empty
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeIntSet 'EdgeGraph.empty'  == IntSet.'IntSet.empty'
--- edgeIntSet . 'EdgeGraph.edge' == IntSet.'IntSet.singleton'
--- edgeIntSet . 'edges'          == IntSet.'IntSet.fromList'
+-- edgeIntSet 'EdgeGraph.empty'  == 'Data.IntSet.empty'
+-- edgeIntSet . 'EdgeGraph.edge' == 'Data.IntSet.singleton'
+-- edgeIntSet . 'edges'          == 'Data.IntSet.fromList'
 -- @
 edgeIntSet :: EdgeGraph Int -> IntSet.IntSet
 edgeIntSet = foldr IntSet.insert IntSet.empty
@@ -440,7 +444,7 @@ nodeCount = I.nodeCount . C.toEdgeGraph
 --
 -- @
 -- nodeList 'EdgeGraph.empty'    == []
--- nodeList ('EdgeGraph.edge' x) == ['I.Node' (Set.'Set.singleton' x) (Set.'Set.singleton' x)]
+-- nodeList ('EdgeGraph.edge' x) == ['EdgeGraph.Incidence.Node' ('Data.Set.singleton' x) ('Data.Set.singleton' x)]
 -- @
 nodeList :: Ord a => EdgeGraph a -> [I.Node a]
 nodeList = I.nodeList . C.toEdgeGraph
@@ -449,7 +453,7 @@ nodeList = I.nodeList . C.toEdgeGraph
 -- Complexity: /O(s + n * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- nodeSet 'EdgeGraph.empty' == Set.'Set.empty'
+-- nodeSet 'EdgeGraph.empty' == 'Data.Set.empty'
 -- @
 nodeSet :: Ord a => EdgeGraph a -> Set.Set (I.Node a)
 nodeSet = I.nodeSet . C.toEdgeGraph
@@ -703,13 +707,13 @@ simple op x y
 box :: EdgeGraph a -> EdgeGraph b -> EdgeGraph (a, b)
 box = H.box
 
--- | Convert an 'EdgeGraph' to the Boehm-Berarducci encoding ('F.Fold').
+-- | Convert an 'EdgeGraph' to the Boehm-Berarducci encoding ('EdgeGraph.Fold.Fold').
 -- This is useful for applying folds defined in "EdgeGraph.Fold",
--- such as 'F.shortestPaths', 'F.reachable', and 'F.isAcyclic'.
+-- such as 'EdgeGraph.Fold.shortestPaths', 'EdgeGraph.Fold.reachable', and 'EdgeGraph.Fold.isAcyclic'.
 --
 -- @
--- toFold 'EdgeGraph.empty'    == F.'F.empty'
--- toFold ('EdgeGraph.edge' x) == F.'F.edge' x
+-- toFold 'EdgeGraph.empty'    == 'EdgeGraph.Fold.empty'
+-- toFold ('EdgeGraph.edge' x) == 'EdgeGraph.Fold.edge' x
 -- @
 toFold :: EdgeGraph a -> F.Fold a
 toFold = foldg F.empty F.edge F.overlay F.into F.pits F.tips

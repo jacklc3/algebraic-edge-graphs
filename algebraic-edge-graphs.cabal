@@ -17,7 +17,8 @@ tested-with:   GHC ==9.6.6
              , GHC ==9.12.1
 description:
   A library for algebraic construction and manipulation of edge-indexed graphs
-  in Haskell. Based on the theory of algebraic edge graphs.
+  in Haskell. Based on the theory of algebraic edge graphs, as described in
+  <https://jackliellcock.com/papers/edge_graphs/paper.pdf this paper>.
   .
   The top-level module "EdgeGraph" defines the core data type
   'EdgeGraph.EdgeGraph' which is a deep embedding of six graph construction
