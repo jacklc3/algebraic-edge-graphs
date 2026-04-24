@@ -50,7 +50,7 @@ import qualified Data.Tree       as Tree
 -- @
 -- isSubgraphOf 'EdgeGraph.Incidence.empty' x          == True
 -- isSubgraphOf ('edge' x) 'EdgeGraph.Incidence.empty' == False
--- isSubgraphOf x ('overlay' x y)  == True
+-- isSubgraphOf x ('overlay' x y)                      == True
 -- @
 isSubgraphOf :: Ord a => Incidence a -> Incidence a -> Bool
 isSubgraphOf x y = overlay x y == y
@@ -186,8 +186,8 @@ mergeEdges p v = gmap (\u -> if p u then v else u)
 -- Complexity: /O(n * m)/ time.
 --
 -- @
--- edgeIntSet 'EdgeGraph.Incidence.empty'    == IntSet.'IntSet.empty'
--- edgeIntSet ('edge' x) == IntSet.'IntSet.singleton' x
+-- edgeIntSet 'EdgeGraph.Incidence.empty' == 'Data.IntSet.empty'
+-- edgeIntSet ('edge' x)                  == 'Data.IntSet.singleton' x
 -- @
 edgeIntSet :: Incidence Int -> IntSet.IntSet
 edgeIntSet = IntSet.fromAscList . edgeList

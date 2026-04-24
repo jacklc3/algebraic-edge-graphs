@@ -206,9 +206,9 @@ tipss = foldr tips empty
 -- a particular graph instance.
 --
 -- @
--- isSubgraphOf 'EdgeGraph.HigherKinded.Class.empty'    x               == True
--- isSubgraphOf ('edge' x) 'EdgeGraph.HigherKinded.Class.empty'         == False
--- isSubgraphOf x          ('overlay' x y) == True
+-- isSubgraphOf 'EdgeGraph.HigherKinded.Class.empty'    x       == True
+-- isSubgraphOf ('edge' x) 'EdgeGraph.HigherKinded.Class.empty' == False
+-- isSubgraphOf x          ('overlay' x y)                      == True
 -- @
 isSubgraphOf :: (EdgeGraph g, Eq (g a)) => g a -> g a -> Bool
 isSubgraphOf x y = overlay x y == y
@@ -217,10 +217,10 @@ isSubgraphOf x y = overlay x y == y
 -- Complexity: /O(s)/ time.
 --
 -- @
--- isEmpty 'EdgeGraph.HigherKinded.Class.empty'                     == True
+-- isEmpty 'EdgeGraph.HigherKinded.Class.empty'                                                  == True
 -- isEmpty ('overlay' 'EdgeGraph.HigherKinded.Class.empty' 'EdgeGraph.HigherKinded.Class.empty') == True
--- isEmpty ('edge' x)                  == False
--- isEmpty ('removeEdge' x $ 'edge' x) == True
+-- isEmpty ('edge' x)                                                                            == False
+-- isEmpty ('removeEdge' x $ 'edge' x)                                                           == True
 -- @
 isEmpty :: EdgeGraph g => g a -> Bool
 isEmpty = null
@@ -229,9 +229,9 @@ isEmpty = null
 -- Complexity: /O(s)/ time.
 --
 -- @
--- hasEdge x 'EdgeGraph.HigherKinded.Class.empty'          == False
--- hasEdge x ('edge' x)       == True
--- hasEdge x . 'removeEdge' x == const False
+-- hasEdge x 'EdgeGraph.HigherKinded.Class.empty' == False
+-- hasEdge x ('edge' x)                           == True
+-- hasEdge x . 'removeEdge' x                     == const False
 -- @
 hasEdge :: (Eq a, EdgeGraph g) => a -> g a -> Bool
 hasEdge = elem
@@ -240,9 +240,9 @@ hasEdge = elem
 -- Complexity: /O(s * log(n))/ time.
 --
 -- @
--- edgeCount 'EdgeGraph.HigherKinded.Class.empty'    == 0
--- edgeCount ('edge' x) == 1
--- edgeCount            == 'length' . 'edgeList'
+-- edgeCount 'EdgeGraph.HigherKinded.Class.empty' == 0
+-- edgeCount ('edge' x)                           == 1
+-- edgeCount                                      == 'length' . 'edgeList'
 -- @
 edgeCount :: (Ord a, EdgeGraph g) => g a -> Int
 edgeCount = length . edgeList
@@ -251,8 +251,8 @@ edgeCount = length . edgeList
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeList 'EdgeGraph.HigherKinded.Class.empty'    == []
--- edgeList ('edge' x) == [x]
+-- edgeList 'EdgeGraph.HigherKinded.Class.empty' == []
+-- edgeList ('edge' x)                           == [x]
 -- @
 edgeList :: (Ord a, EdgeGraph g) => g a -> [a]
 edgeList = Set.toAscList . edgeSet
@@ -261,8 +261,8 @@ edgeList = Set.toAscList . edgeSet
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeSet 'EdgeGraph.HigherKinded.Class.empty'  == Set.'Set.empty'
--- edgeSet . 'edge' == Set.'Set.singleton'
+-- edgeSet 'EdgeGraph.HigherKinded.Class.empty' == 'Data.Set.empty'
+-- edgeSet . 'edge'                             == 'Data.Set.singleton'
 -- @
 edgeSet :: (Ord a, EdgeGraph g) => g a -> Set.Set a
 edgeSet = foldr Set.insert Set.empty
@@ -272,8 +272,8 @@ edgeSet = foldr Set.insert Set.empty
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeIntSet 'EdgeGraph.HigherKinded.Class.empty'  == IntSet.'IntSet.empty'
--- edgeIntSet . 'edge' == IntSet.'IntSet.singleton'
+-- edgeIntSet 'EdgeGraph.HigherKinded.Class.empty' == 'Data.IntSet.empty'
+-- edgeIntSet . 'edge'                             == 'Data.IntSet.singleton'
 -- @
 edgeIntSet :: EdgeGraph g => g Int -> IntSet.IntSet
 edgeIntSet = foldr IntSet.insert IntSet.empty
@@ -386,9 +386,9 @@ forest = overlays . map tree
 -- lengths of the given lists.
 --
 -- @
--- mesh xs     []   == 'EdgeGraph.HigherKinded.Class.empty'
--- mesh []     ys   == 'EdgeGraph.HigherKinded.Class.empty'
--- mesh [x]    [y]  == 'edge' (x, y)
+-- mesh xs     []  == 'EdgeGraph.HigherKinded.Class.empty'
+-- mesh []     ys  == 'EdgeGraph.HigherKinded.Class.empty'
+-- mesh [x]    [y] == 'edge' (x, y)
 -- @
 mesh :: EdgeGraph g => [a] -> [b] -> g (a, b)
 mesh xs ys = path xs `box` path ys
@@ -398,8 +398,8 @@ mesh xs ys = path xs `box` path ys
 -- lengths of the given lists.
 --
 -- @
--- torus xs     []   == 'EdgeGraph.HigherKinded.Class.empty'
--- torus []     ys   == 'EdgeGraph.HigherKinded.Class.empty'
+-- torus xs     [] == 'EdgeGraph.HigherKinded.Class.empty'
+-- torus []     ys == 'EdgeGraph.HigherKinded.Class.empty'
 -- @
 torus :: EdgeGraph g => [a] -> [b] -> g (a, b)
 torus xs ys = circuit xs `box` circuit ys
@@ -493,11 +493,11 @@ induce = mfilter
 -- stands for the equality up to an isomorphism, e.g. @(x, ()) ~~ x@.
 --
 -- @
--- box x y               ~~ box y x
--- box x (box y z)       ~~ box (box x y) z
--- box x ('overlay' y z) == 'overlay' (box x y) (box x z)
--- box x ('edge' ())     ~~ x
--- box x 'EdgeGraph.HigherKinded.Class.empty'         ~~ 'EdgeGraph.HigherKinded.Class.empty'
+-- box x y                                    ~~ box y x
+-- box x (box y z)                            ~~ box (box x y) z
+-- box x ('overlay' y z)                      == 'overlay' (box x y) (box x z)
+-- box x ('edge' ())                          ~~ x
+-- box x 'EdgeGraph.HigherKinded.Class.empty' ~~ 'EdgeGraph.HigherKinded.Class.empty'
 -- @
 box :: EdgeGraph g => g a -> g b -> g (a, b)
 box x y = msum $ xs ++ ys

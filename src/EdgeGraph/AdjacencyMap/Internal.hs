@@ -59,11 +59,11 @@ data Adjacency a = Adjacency
 
 -- | The t'AdjacencyMap' data type represents an edge-indexed graph as a map
 -- from each edge to its t'Adjacency' information. This is an equivalent
--- representation to 'I.Incidence' (the canonical flow representation for
+-- representation to 'EdgeGraph.Incidence.Internal.Incidence' (the canonical flow representation for
 -- algebraic edge graphs), but indexed by edge for efficient lookups.
 --
 -- The 'Eq' instance is derived from the underlying 'Map' and is correct
--- because the representation is canonical (one-to-one with 'I.Incidence').
+-- because the representation is canonical (one-to-one with 'EdgeGraph.Incidence.Internal.Incidence').
 newtype AdjacencyMap a = AdjacencyMap
   { adjacencyMap :: Map a (Adjacency a)
   } deriving Eq
@@ -80,14 +80,14 @@ instance Ord a => C.EdgeGraph (AdjacencyMap a) where
   pits    = pits
   tips    = tips
 
--- | Convert an t'AdjacencyMap' to its equivalent 'I.Incidence' representation.
+-- | Convert an t'AdjacencyMap' to its equivalent 'EdgeGraph.Incidence.Internal.Incidence' representation.
 --
 -- For each edge, reconstruct its source node (pitNode) and sink node (tipNode),
 -- then collect all unique nodes into a set.
 --
 -- @
--- 'toIncidence' 'EdgeGraph.AdjacencyMap.Internal.empty'    == 'I.empty'
--- 'toIncidence' ('EdgeGraph.AdjacencyMap.Internal.edge' x) == 'I.edge' x
+-- 'toIncidence' 'EdgeGraph.AdjacencyMap.Internal.empty'    == 'EdgeGraph.Incidence.Internal.empty'
+-- 'toIncidence' ('EdgeGraph.AdjacencyMap.Internal.edge' x) == 'EdgeGraph.Incidence.Internal.edge' x
 -- @
 toIncidence :: Ord a => AdjacencyMap a -> I.Incidence a
 toIncidence (AdjacencyMap m)
@@ -100,14 +100,14 @@ toIncidence (AdjacencyMap m)
       , I.Node (joins adj) (succs adj)   -- sink node
       ]
 
--- | Convert an 'I.Incidence' to an t'AdjacencyMap'.
+-- | Convert an 'EdgeGraph.Incidence.Internal.Incidence' to an t'AdjacencyMap'.
 --
 -- Scans all nodes once to build edge-to-source and edge-to-sink maps,
 -- then constructs the t'Adjacency' record for each edge.
 --
 -- @
--- 'fromIncidence' 'I.empty'    == 'EdgeGraph.AdjacencyMap.Internal.empty'
--- 'fromIncidence' ('I.edge' x) == 'EdgeGraph.AdjacencyMap.Internal.edge' x
+-- 'fromIncidence' 'EdgeGraph.Incidence.Internal.empty'    == 'EdgeGraph.AdjacencyMap.Internal.empty'
+-- 'fromIncidence' ('EdgeGraph.Incidence.Internal.edge' x) == 'EdgeGraph.AdjacencyMap.Internal.edge' x
 -- @
 fromIncidence :: Ord a => I.Incidence a -> AdjacencyMap a
 fromIncidence (I.Incidence ns)
@@ -144,10 +144,10 @@ fromIncidence (I.Incidence ns)
 -- 6. All referenced edges exist in the map
 --
 -- @
--- consistent 'EdgeGraph.AdjacencyMap.Internal.empty'         == True
--- consistent ('EdgeGraph.AdjacencyMap.Internal.edge' x)      == True
--- consistent ('overlay' x y) == True
--- consistent ('into' x y)    == True
+-- consistent 'EdgeGraph.AdjacencyMap.Internal.empty'    == True
+-- consistent ('EdgeGraph.AdjacencyMap.Internal.edge' x) == True
+-- consistent ('overlay' x y)                            == True
+-- consistent ('into' x y)                               == True
 -- @
 consistent :: Ord a => AdjacencyMap a -> Bool
 consistent (AdjacencyMap m) =
@@ -216,12 +216,12 @@ edge a = AdjacencyMap $ Map.singleton a $ Adjacency
 -- representations by merging nodes that share edges.
 --
 -- @
--- 'isEmpty' ('overlay' x y)   == 'isEmpty' x && 'isEmpty' y
--- 'overlay' 'EdgeGraph.AdjacencyMap.Internal.empty' x         == x
--- 'overlay' x 'EdgeGraph.AdjacencyMap.Internal.empty'         == x
--- 'overlay' x y               == 'overlay' y x
--- 'overlay' x ('overlay' y z) == 'overlay' ('overlay' x y) z
--- 'overlay' x x               == x
+-- 'isEmpty' ('overlay' x y)                           == 'isEmpty' x && 'isEmpty' y
+-- 'overlay' 'EdgeGraph.AdjacencyMap.Internal.empty' x == x
+-- 'overlay' x 'EdgeGraph.AdjacencyMap.Internal.empty' == x
+-- 'overlay' x y                                       == 'overlay' y x
+-- 'overlay' x ('overlay' y z)                         == 'overlay' ('overlay' x y) z
+-- 'overlay' x x                                       == x
 -- @
 overlay :: Ord a => AdjacencyMap a -> AdjacencyMap a -> AdjacencyMap a
 overlay x y = fromIncidence $ I.overlay (toIncidence x) (toIncidence y)
@@ -230,9 +230,9 @@ overlay x y = fromIncidence $ I.overlay (toIncidence x) (toIncidence y)
 -- source side of the right graph, creating a sequential composition.
 --
 -- @
--- 'isEmpty' ('into' x y) == 'isEmpty' x && 'isEmpty' y
--- 'into' 'EdgeGraph.AdjacencyMap.Internal.empty' x       == x
--- 'into' x 'EdgeGraph.AdjacencyMap.Internal.empty'       == x
+-- 'isEmpty' ('into' x y)                           == 'isEmpty' x && 'isEmpty' y
+-- 'into' 'EdgeGraph.AdjacencyMap.Internal.empty' x == x
+-- 'into' x 'EdgeGraph.AdjacencyMap.Internal.empty' == x
 -- @
 into :: Ord a => AdjacencyMap a -> AdjacencyMap a -> AdjacencyMap a
 into x y = fromIncidence $ I.into (toIncidence x) (toIncidence y)
@@ -312,7 +312,7 @@ edgeList (AdjacencyMap m) = Map.keys m
 --
 -- @
 -- adjacencyList 'EdgeGraph.AdjacencyMap.Internal.empty'    == []
--- adjacencyList ('EdgeGraph.AdjacencyMap.Internal.edge' x) == [(x, Adjacency (Set.'Data.Set.singleton' x) (Set.'Data.Set.singleton' x) Set.'Data.Set.empty' Set.'Data.Set.empty')]
+-- adjacencyList ('EdgeGraph.AdjacencyMap.Internal.edge' x) == [(x, Adjacency ('Data.Set.singleton' x) ('Data.Set.singleton' x) 'Data.Set.empty' 'Data.Set.empty')]
 -- @
 adjacencyList :: AdjacencyMap a -> [(a, Adjacency a)]
 adjacencyList (AdjacencyMap m) = Map.toAscList m
@@ -358,9 +358,9 @@ removeEdge x (AdjacencyMap m) = case Map.lookup x m of
 -- Complexity: /O((|forks| + |preds|) * log n)/ time.
 --
 -- @
--- detachPit x ('EdgeGraph.AdjacencyMap.Internal.edge' x)                      == 'EdgeGraph.AdjacencyMap.Internal.edge' x
--- detachPit 2 ('into' ('EdgeGraph.AdjacencyMap.Internal.edge' 1) ('EdgeGraph.AdjacencyMap.Internal.edge' 2))  == 'edges' [1, 2]
--- detachPit 1 ('pits' ('EdgeGraph.AdjacencyMap.Internal.edge' 1) ('EdgeGraph.AdjacencyMap.Internal.edge' 2))  == 'edges' [1, 2]
+-- detachPit x ('EdgeGraph.AdjacencyMap.Internal.edge' x)                                                     == 'EdgeGraph.AdjacencyMap.Internal.edge' x
+-- detachPit 2 ('into' ('EdgeGraph.AdjacencyMap.Internal.edge' 1) ('EdgeGraph.AdjacencyMap.Internal.edge' 2)) == 'edges' [1, 2]
+-- detachPit 1 ('pits' ('EdgeGraph.AdjacencyMap.Internal.edge' 1) ('EdgeGraph.AdjacencyMap.Internal.edge' 2)) == 'edges' [1, 2]
 -- @
 detachPit :: Ord a => a -> AdjacencyMap a -> AdjacencyMap a
 detachPit a (AdjacencyMap m) = case Map.lookup a m of
@@ -383,9 +383,9 @@ detachPit a (AdjacencyMap m) = case Map.lookup a m of
 -- Complexity: /O((|joins| + |succs|) * log n)/ time.
 --
 -- @
--- detachTip x ('EdgeGraph.AdjacencyMap.Internal.edge' x)                      == 'EdgeGraph.AdjacencyMap.Internal.edge' x
--- detachTip 1 ('into' ('EdgeGraph.AdjacencyMap.Internal.edge' 1) ('EdgeGraph.AdjacencyMap.Internal.edge' 2))  == 'edges' [1, 2]
--- detachTip 1 ('tips' ('EdgeGraph.AdjacencyMap.Internal.edge' 1) ('EdgeGraph.AdjacencyMap.Internal.edge' 2))  == 'edges' [1, 2]
+-- detachTip x ('EdgeGraph.AdjacencyMap.Internal.edge' x)                                                     == 'EdgeGraph.AdjacencyMap.Internal.edge' x
+-- detachTip 1 ('into' ('EdgeGraph.AdjacencyMap.Internal.edge' 1) ('EdgeGraph.AdjacencyMap.Internal.edge' 2)) == 'edges' [1, 2]
+-- detachTip 1 ('tips' ('EdgeGraph.AdjacencyMap.Internal.edge' 1) ('EdgeGraph.AdjacencyMap.Internal.edge' 2)) == 'edges' [1, 2]
 -- @
 detachTip :: Ord a => a -> AdjacencyMap a -> AdjacencyMap a
 detachTip a (AdjacencyMap m) = case Map.lookup a m of
@@ -408,8 +408,8 @@ detachTip a (AdjacencyMap m) = case Map.lookup a m of
 -- @
 -- gmap f 'EdgeGraph.AdjacencyMap.Internal.empty'    == 'EdgeGraph.AdjacencyMap.Internal.empty'
 -- gmap f ('EdgeGraph.AdjacencyMap.Internal.edge' x) == 'EdgeGraph.AdjacencyMap.Internal.edge' (f x)
--- gmap id           == id
--- gmap f . gmap g   == gmap (f . g)
+-- gmap id                                           == id
+-- gmap f . gmap g                                   == gmap (f . g)
 -- @
 gmap :: (Ord a, Ord b) => (a -> b) -> AdjacencyMap a -> AdjacencyMap b
 gmap f = fromIncidence . I.gmap f . toIncidence

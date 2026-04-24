@@ -1,6 +1,6 @@
 cabal-version: 2.4
 name:          algebraic-edge-graphs
-version:       0.1.0
+version:       0.1.1
 synopsis:      A library for algebraic edge-graph construction and transformation
 license:       MIT
 license-file:  LICENSE

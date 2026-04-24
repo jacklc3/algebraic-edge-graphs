@@ -65,14 +65,14 @@ instance C.EdgeGraph IntAdjacencyMap where
   pits    = pits
   tips    = tips
 
--- | Convert an t'IntAdjacencyMap' to its equivalent 'I.Incidence' representation.
+-- | Convert an t'IntAdjacencyMap' to its equivalent 'EdgeGraph.Incidence.Internal.Incidence' representation.
 --
 -- For each edge, reconstruct its source node (pitNode) and sink node (tipNode),
 -- then collect all unique nodes into a set.
 --
 -- @
--- 'toIncidence' 'EdgeGraph.IntAdjacencyMap.Internal.empty'    == 'I.empty'
--- 'toIncidence' ('EdgeGraph.IntAdjacencyMap.Internal.edge' x) == 'I.edge' x
+-- 'toIncidence' 'EdgeGraph.IntAdjacencyMap.Internal.empty'    == 'EdgeGraph.Incidence.Internal.empty'
+-- 'toIncidence' ('EdgeGraph.IntAdjacencyMap.Internal.edge' x) == 'EdgeGraph.Incidence.Internal.edge' x
 -- @
 toIncidence :: IntAdjacencyMap -> I.Incidence Int
 toIncidence (IntAdjacencyMap m)
@@ -85,14 +85,14 @@ toIncidence (IntAdjacencyMap m)
       , I.Node (joins adj) (succs adj)
       ]
 
--- | Convert an 'I.Incidence' to an t'IntAdjacencyMap'.
+-- | Convert an 'EdgeGraph.Incidence.Internal.Incidence' to an t'IntAdjacencyMap'.
 --
 -- Scans all nodes once to build edge-to-source and edge-to-sink maps,
 -- then constructs the t'Adjacency' record for each edge.
 --
 -- @
--- 'fromIncidence' 'I.empty'    == 'EdgeGraph.IntAdjacencyMap.Internal.empty'
--- 'fromIncidence' ('I.edge' x) == 'EdgeGraph.IntAdjacencyMap.Internal.edge' x
+-- 'fromIncidence' 'EdgeGraph.Incidence.Internal.empty'    == 'EdgeGraph.IntAdjacencyMap.Internal.empty'
+-- 'fromIncidence' ('EdgeGraph.Incidence.Internal.edge' x) == 'EdgeGraph.IntAdjacencyMap.Internal.edge' x
 -- @
 fromIncidence :: I.Incidence Int -> IntAdjacencyMap
 fromIncidence (I.Incidence ns)
@@ -127,10 +127,10 @@ fromIncidence (I.Incidence ns)
 -- 6. All referenced edges exist in the map
 --
 -- @
--- consistent 'EdgeGraph.IntAdjacencyMap.Internal.empty'         == True
--- consistent ('EdgeGraph.IntAdjacencyMap.Internal.edge' x)      == True
--- consistent ('overlay' x y) == True
--- consistent ('into' x y)    == True
+-- consistent 'EdgeGraph.IntAdjacencyMap.Internal.empty'    == True
+-- consistent ('EdgeGraph.IntAdjacencyMap.Internal.edge' x) == True
+-- consistent ('overlay' x y)                               == True
+-- consistent ('into' x y)                                  == True
 -- @
 consistent :: IntAdjacencyMap -> Bool
 consistent (IntAdjacencyMap m) =
@@ -205,12 +205,12 @@ edge a = IntAdjacencyMap $ Map.singleton a $ Adjacency
 -- representations by merging nodes that share edges.
 --
 -- @
--- 'isEmpty' ('overlay' x y)   == 'isEmpty' x && 'isEmpty' y
--- 'overlay' 'EdgeGraph.IntAdjacencyMap.Internal.empty' x         == x
--- 'overlay' x 'EdgeGraph.IntAdjacencyMap.Internal.empty'         == x
--- 'overlay' x y               == 'overlay' y x
--- 'overlay' x ('overlay' y z) == 'overlay' ('overlay' x y) z
--- 'overlay' x x               == x
+-- 'isEmpty' ('overlay' x y)                              == 'isEmpty' x && 'isEmpty' y
+-- 'overlay' 'EdgeGraph.IntAdjacencyMap.Internal.empty' x == x
+-- 'overlay' x 'EdgeGraph.IntAdjacencyMap.Internal.empty' == x
+-- 'overlay' x y                                          == 'overlay' y x
+-- 'overlay' x ('overlay' y z)                            == 'overlay' ('overlay' x y) z
+-- 'overlay' x x                                          == x
 -- @
 overlay :: IntAdjacencyMap -> IntAdjacencyMap -> IntAdjacencyMap
 overlay x y = fromIncidence $ I.overlay (toIncidence x) (toIncidence y)
@@ -219,9 +219,9 @@ overlay x y = fromIncidence $ I.overlay (toIncidence x) (toIncidence y)
 -- source side of the right graph, creating a sequential composition.
 --
 -- @
--- 'isEmpty' ('into' x y) == 'isEmpty' x && 'isEmpty' y
--- 'into' 'EdgeGraph.IntAdjacencyMap.Internal.empty' x       == x
--- 'into' x 'EdgeGraph.IntAdjacencyMap.Internal.empty'       == x
+-- 'isEmpty' ('into' x y)                              == 'isEmpty' x && 'isEmpty' y
+-- 'into' 'EdgeGraph.IntAdjacencyMap.Internal.empty' x == x
+-- 'into' x 'EdgeGraph.IntAdjacencyMap.Internal.empty' == x
 -- @
 into :: IntAdjacencyMap -> IntAdjacencyMap -> IntAdjacencyMap
 into x y = fromIncidence $ I.into (toIncidence x) (toIncidence y)
@@ -346,9 +346,9 @@ removeEdge x (IntAdjacencyMap m) = case Map.lookup x m of
 -- Complexity: /O((|forks| + |preds|) * log n)/ time.
 --
 -- @
--- detachPit x ('EdgeGraph.IntAdjacencyMap.Internal.edge' x)                      == 'EdgeGraph.IntAdjacencyMap.Internal.edge' x
--- detachPit 2 ('into' ('EdgeGraph.IntAdjacencyMap.Internal.edge' 1) ('EdgeGraph.IntAdjacencyMap.Internal.edge' 2))  == 'edges' [1, 2]
--- detachPit 1 ('pits' ('EdgeGraph.IntAdjacencyMap.Internal.edge' 1) ('EdgeGraph.IntAdjacencyMap.Internal.edge' 2))  == 'edges' [1, 2]
+-- detachPit x ('EdgeGraph.IntAdjacencyMap.Internal.edge' x)                                                        == 'EdgeGraph.IntAdjacencyMap.Internal.edge' x
+-- detachPit 2 ('into' ('EdgeGraph.IntAdjacencyMap.Internal.edge' 1) ('EdgeGraph.IntAdjacencyMap.Internal.edge' 2)) == 'edges' [1, 2]
+-- detachPit 1 ('pits' ('EdgeGraph.IntAdjacencyMap.Internal.edge' 1) ('EdgeGraph.IntAdjacencyMap.Internal.edge' 2)) == 'edges' [1, 2]
 -- @
 detachPit :: Int -> IntAdjacencyMap -> IntAdjacencyMap
 detachPit a (IntAdjacencyMap m) = case Map.lookup a m of
@@ -371,9 +371,9 @@ detachPit a (IntAdjacencyMap m) = case Map.lookup a m of
 -- Complexity: /O((|joins| + |succs|) * log n)/ time.
 --
 -- @
--- detachTip x ('EdgeGraph.IntAdjacencyMap.Internal.edge' x)                      == 'EdgeGraph.IntAdjacencyMap.Internal.edge' x
--- detachTip 1 ('into' ('EdgeGraph.IntAdjacencyMap.Internal.edge' 1) ('EdgeGraph.IntAdjacencyMap.Internal.edge' 2))  == 'edges' [1, 2]
--- detachTip 1 ('tips' ('EdgeGraph.IntAdjacencyMap.Internal.edge' 1) ('EdgeGraph.IntAdjacencyMap.Internal.edge' 2))  == 'edges' [1, 2]
+-- detachTip x ('EdgeGraph.IntAdjacencyMap.Internal.edge' x)                                                        == 'EdgeGraph.IntAdjacencyMap.Internal.edge' x
+-- detachTip 1 ('into' ('EdgeGraph.IntAdjacencyMap.Internal.edge' 1) ('EdgeGraph.IntAdjacencyMap.Internal.edge' 2)) == 'edges' [1, 2]
+-- detachTip 1 ('tips' ('EdgeGraph.IntAdjacencyMap.Internal.edge' 1) ('EdgeGraph.IntAdjacencyMap.Internal.edge' 2)) == 'edges' [1, 2]
 -- @
 detachTip :: Int -> IntAdjacencyMap -> IntAdjacencyMap
 detachTip a (IntAdjacencyMap m) = case Map.lookup a m of
@@ -396,8 +396,8 @@ detachTip a (IntAdjacencyMap m) = case Map.lookup a m of
 -- @
 -- gmap f 'EdgeGraph.IntAdjacencyMap.Internal.empty'    == 'EdgeGraph.IntAdjacencyMap.Internal.empty'
 -- gmap f ('EdgeGraph.IntAdjacencyMap.Internal.edge' x) == 'EdgeGraph.IntAdjacencyMap.Internal.edge' (f x)
--- gmap id           == id
--- gmap f . gmap g   == gmap (f . g)
+-- gmap id                                              == id
+-- gmap f . gmap g                                      == gmap (f . g)
 -- @
 gmap :: (Int -> Int) -> IntAdjacencyMap -> IntAdjacencyMap
 gmap f = fromIncidence . I.gmap f . toIncidence

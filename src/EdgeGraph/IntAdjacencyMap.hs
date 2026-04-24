@@ -114,9 +114,9 @@ mergeEdges p v = gmap $ \u -> if p u then v else u
 -- i.e. the edges that the given edge flows into.
 --
 -- @
--- postset x 'EdgeGraph.IntAdjacencyMap.empty'                        == Set.'Set.empty'
--- postset x ('EdgeGraph.IntAdjacencyMap.edge' x)                     == Set.'Set.empty'
--- postset 1 ('into' ('EdgeGraph.IntAdjacencyMap.edge' 1) ('EdgeGraph.IntAdjacencyMap.edge' 2)) == Set.'Set.singleton' 2
+-- postset x 'EdgeGraph.IntAdjacencyMap.empty'                                                  == 'Data.Set.empty'
+-- postset x ('EdgeGraph.IntAdjacencyMap.edge' x)                                               == 'Data.Set.empty'
+-- postset 1 ('into' ('EdgeGraph.IntAdjacencyMap.edge' 1) ('EdgeGraph.IntAdjacencyMap.edge' 2)) == 'Data.Set.singleton' 2
 -- @
 postset :: Int -> IntAdjacencyMap -> Set Int
 postset a (IntAdjacencyMap m) = maybe Set.empty succs (Map.lookup a m)
@@ -126,9 +126,9 @@ postset a (IntAdjacencyMap m) = maybe Set.empty succs (Map.lookup a m)
 -- i.e. the edges that flow into the given edge.
 --
 -- @
--- preset x 'EdgeGraph.IntAdjacencyMap.empty'                        == Set.'Set.empty'
--- preset x ('EdgeGraph.IntAdjacencyMap.edge' x)                     == Set.'Set.empty'
--- preset 2 ('into' ('EdgeGraph.IntAdjacencyMap.edge' 1) ('EdgeGraph.IntAdjacencyMap.edge' 2)) == Set.'Set.singleton' 1
+-- preset x 'EdgeGraph.IntAdjacencyMap.empty'                                                  == 'Data.Set.empty'
+-- preset x ('EdgeGraph.IntAdjacencyMap.edge' x)                                               == 'Data.Set.empty'
+-- preset 2 ('into' ('EdgeGraph.IntAdjacencyMap.edge' 1) ('EdgeGraph.IntAdjacencyMap.edge' 2)) == 'Data.Set.singleton' 1
 -- @
 preset :: Int -> IntAdjacencyMap -> Set Int
 preset a (IntAdjacencyMap m) = maybe Set.empty preds (Map.lookup a m)
@@ -144,10 +144,10 @@ graphKL (IntAdjacencyMap m) = (g, \u -> case r u of (_, v, _) -> v)
 -- directed flow from each edge to its successors.
 --
 -- @
--- 'dfsForest' 'EdgeGraph.IntAdjacencyMap.empty'                         == []
--- 'dfsForest' ('EdgeGraph.IntAdjacencyMap.edge' x)                      == [Node x []]
--- 'isSubgraphOf' ('forest' $ 'dfsForest' x) x == True
--- 'dfsForest' . 'forest' . 'dfsForest'        == 'dfsForest'
+-- 'dfsForest' 'EdgeGraph.IntAdjacencyMap.empty'    == []
+-- 'dfsForest' ('EdgeGraph.IntAdjacencyMap.edge' x) == [Node x []]
+-- 'isSubgraphOf' ('forest' $ 'dfsForest' x) x      == True
+-- 'dfsForest' . 'forest' . 'dfsForest'             == 'dfsForest'
 -- @
 dfsForest :: IntAdjacencyMap -> Forest Int
 dfsForest m = let (g, r) = graphKL m in fmap (fmap r) (KL.dff g)
@@ -158,9 +158,9 @@ dfsForest m = let (g, r) = graphKL m in fmap (fmap r) (KL.dff g)
 -- (via 'into'), then @a@ appears before @b@ in the result.
 --
 -- @
--- 'topSort' ('path' [1, 2, 3]) == Just [1, 2, 3]
--- 'topSort' ('circuit' [1, 2]) == Nothing
--- 'topSort' ('EdgeGraph.IntAdjacencyMap.edge' x)         == Just [x]
+-- 'topSort' ('path' [1, 2, 3])                   == Just [1, 2, 3]
+-- 'topSort' ('circuit' [1, 2])                   == Nothing
+-- 'topSort' ('EdgeGraph.IntAdjacencyMap.edge' x) == Just [x]
 -- @
 topSort :: IntAdjacencyMap -> Maybe [Int]
 topSort m = if isTopSort result m then Just result else Nothing
