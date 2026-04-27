@@ -117,10 +117,10 @@ instance Ord a => C.EdgeGraph (Incidence a) where
 -- 4. The union of all tips equals the union of all pits (same edge set)
 --
 -- @
--- consistent 'EdgeGraph.Incidence.Internal.empty' == True
--- consistent ('edge' x)                           == True
--- consistent ('overlay' x y)                      == True
--- consistent ('into' x y)                         == True
+-- consistent 'EdgeGraph.Incidence.Internal.empty'         == True
+-- consistent ('edge' x)      == True
+-- consistent ('overlay' x y) == True
+-- consistent ('into' x y)    == True
 -- @
 consistent :: Ord a => Incidence a -> Bool
 consistent (Incidence ns) = noEmptyNodes && disjointTips && disjointPits && sameDomain
@@ -219,12 +219,12 @@ edge a = Incidence $ Set.fromList
 -- Complexity: /O(n^2 * m)/ time.
 --
 -- @
--- 'isEmpty' ('overlay' x y)                        == 'isEmpty' x && 'isEmpty' y
--- 'overlay' 'EdgeGraph.Incidence.Internal.empty' x == x
--- 'overlay' x 'EdgeGraph.Incidence.Internal.empty' == x
--- 'overlay' x y                                    == 'overlay' y x
--- 'overlay' x ('overlay' y z)                      == 'overlay' ('overlay' x y) z
--- 'overlay' x x                                    == x
+-- 'isEmpty' ('overlay' x y)       == 'isEmpty' x && 'isEmpty' y
+-- 'overlay' 'EdgeGraph.Incidence.Internal.empty' x             == x
+-- 'overlay' x     'EdgeGraph.Incidence.Internal.empty'         == x
+-- 'overlay' x     y             == 'overlay' y x
+-- 'overlay' x     ('overlay' y z) == 'overlay' ('overlay' x y) z
+-- 'overlay' x     x             == x
 -- @
 overlay :: Ord a => Incidence a -> Incidence a -> Incidence a
 overlay (Incidence xs) (Incidence ys) =
@@ -245,10 +245,10 @@ ci d e
 -- Complexity: /O((n + |E_l| * |E_r|)^2 * m)/ time.
 --
 -- @
--- 'isEmpty' ('into' x y)                        == 'isEmpty' x && 'isEmpty' y
--- 'into' 'EdgeGraph.Incidence.Internal.empty' x == x
--- 'into' x 'EdgeGraph.Incidence.Internal.empty' == x
--- 'into' ('edge' x) ('edge' y)                  /= 'overlay' ('edge' x) ('edge' y)
+-- 'isEmpty' ('into' x y)     == 'isEmpty' x && 'isEmpty' y
+-- 'into' 'EdgeGraph.Incidence.Internal.empty' x           == x
+-- 'into' x 'EdgeGraph.Incidence.Internal.empty'           == x
+-- 'into' ('edge' x) ('edge' y) /= 'overlay' ('edge' x) ('edge' y)
 -- @
 into :: Ord a => Incidence a -> Incidence a -> Incidence a
 into x y = Incidence $ normalize allNodes
@@ -393,7 +393,7 @@ removeEdge x (Incidence ns) = Incidence $ Set.fromList
 -- Complexity: /O(n * log(n))/ time.
 --
 -- @
--- detachPit x ('edge' x)                     == 'edge' x
+-- detachPit x ('edge' x)                 == 'edge' x
 -- detachPit 2 ('into' ('edge' 1) ('edge' 2)) == 'edges' [1, 2]
 -- detachPit 1 ('pits' ('edge' 1) ('edge' 2)) == 'edges' [1, 2]
 -- @
@@ -419,7 +419,7 @@ detachPit a r@(Incidence ns)
 -- Complexity: /O(n * log(n))/ time.
 --
 -- @
--- detachTip x ('edge' x)                     == 'edge' x
+-- detachTip x ('edge' x)                 == 'edge' x
 -- detachTip 1 ('into' ('edge' 1) ('edge' 2)) == 'edges' [1, 2]
 -- detachTip 1 ('tips' ('edge' 1) ('edge' 2)) == 'edges' [1, 2]
 -- @
@@ -444,10 +444,10 @@ detachTip a r@(Incidence ns)
 -- Complexity: /O(n^2 * m * log(m))/ time.
 --
 -- @
--- gmap f 'EdgeGraph.Incidence.Internal.empty' == 'EdgeGraph.Incidence.Internal.empty'
--- gmap f ('edge' x)                           == 'edge' (f x)
--- gmap id                                     == id
--- gmap f . gmap g                             == gmap (f . g)
+-- gmap f 'EdgeGraph.Incidence.Internal.empty'    == 'EdgeGraph.Incidence.Internal.empty'
+-- gmap f ('edge' x) == 'edge' (f x)
+-- gmap id         == id
+-- gmap f . gmap g == gmap (f . g)
 -- @
 gmap :: (Ord a, Ord b) => (a -> b) -> Incidence a -> Incidence b
 gmap f (Incidence ns) = Incidence $ normalize $ map mapNode $ Set.toList ns

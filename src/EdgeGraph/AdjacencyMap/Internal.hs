@@ -144,10 +144,10 @@ fromIncidence (I.Incidence ns)
 -- 6. All referenced edges exist in the map
 --
 -- @
--- consistent 'EdgeGraph.AdjacencyMap.Internal.empty'    == True
--- consistent ('EdgeGraph.AdjacencyMap.Internal.edge' x) == True
--- consistent ('overlay' x y)                            == True
--- consistent ('into' x y)                               == True
+-- consistent 'EdgeGraph.AdjacencyMap.Internal.empty'         == True
+-- consistent ('EdgeGraph.AdjacencyMap.Internal.edge' x)      == True
+-- consistent ('overlay' x y) == True
+-- consistent ('into' x y)    == True
 -- @
 consistent :: Ord a => AdjacencyMap a -> Bool
 consistent (AdjacencyMap m) =
@@ -216,12 +216,12 @@ edge a = AdjacencyMap $ Map.singleton a $ Adjacency
 -- representations by merging nodes that share edges.
 --
 -- @
--- 'isEmpty' ('overlay' x y)                           == 'isEmpty' x && 'isEmpty' y
--- 'overlay' 'EdgeGraph.AdjacencyMap.Internal.empty' x == x
--- 'overlay' x 'EdgeGraph.AdjacencyMap.Internal.empty' == x
--- 'overlay' x y                                       == 'overlay' y x
--- 'overlay' x ('overlay' y z)                         == 'overlay' ('overlay' x y) z
--- 'overlay' x x                                       == x
+-- 'isEmpty' ('overlay' x y)       == 'isEmpty' x && 'isEmpty' y
+-- 'overlay' 'EdgeGraph.AdjacencyMap.Internal.empty' x             == x
+-- 'overlay' x     'EdgeGraph.AdjacencyMap.Internal.empty'         == x
+-- 'overlay' x     y             == 'overlay' y x
+-- 'overlay' x     ('overlay' y z) == 'overlay' ('overlay' x y) z
+-- 'overlay' x     x             == x
 -- @
 overlay :: Ord a => AdjacencyMap a -> AdjacencyMap a -> AdjacencyMap a
 overlay x y = fromIncidence $ I.overlay (toIncidence x) (toIncidence y)
@@ -230,9 +230,9 @@ overlay x y = fromIncidence $ I.overlay (toIncidence x) (toIncidence y)
 -- source side of the right graph, creating a sequential composition.
 --
 -- @
--- 'isEmpty' ('into' x y)                           == 'isEmpty' x && 'isEmpty' y
--- 'into' 'EdgeGraph.AdjacencyMap.Internal.empty' x == x
--- 'into' x 'EdgeGraph.AdjacencyMap.Internal.empty' == x
+-- 'isEmpty' ('into' x y) == 'isEmpty' x && 'isEmpty' y
+-- 'into' 'EdgeGraph.AdjacencyMap.Internal.empty' x       == x
+-- 'into' x 'EdgeGraph.AdjacencyMap.Internal.empty'       == x
 -- @
 into :: Ord a => AdjacencyMap a -> AdjacencyMap a -> AdjacencyMap a
 into x y = fromIncidence $ I.into (toIncidence x) (toIncidence y)
@@ -358,7 +358,7 @@ removeEdge x (AdjacencyMap m) = case Map.lookup x m of
 -- Complexity: /O((|forks| + |preds|) * log n)/ time.
 --
 -- @
--- detachPit x ('EdgeGraph.AdjacencyMap.Internal.edge' x)                                                     == 'EdgeGraph.AdjacencyMap.Internal.edge' x
+-- detachPit x ('EdgeGraph.AdjacencyMap.Internal.edge' x)                 == 'EdgeGraph.AdjacencyMap.Internal.edge' x
 -- detachPit 2 ('into' ('EdgeGraph.AdjacencyMap.Internal.edge' 1) ('EdgeGraph.AdjacencyMap.Internal.edge' 2)) == 'edges' [1, 2]
 -- detachPit 1 ('pits' ('EdgeGraph.AdjacencyMap.Internal.edge' 1) ('EdgeGraph.AdjacencyMap.Internal.edge' 2)) == 'edges' [1, 2]
 -- @
@@ -383,7 +383,7 @@ detachPit a (AdjacencyMap m) = case Map.lookup a m of
 -- Complexity: /O((|joins| + |succs|) * log n)/ time.
 --
 -- @
--- detachTip x ('EdgeGraph.AdjacencyMap.Internal.edge' x)                                                     == 'EdgeGraph.AdjacencyMap.Internal.edge' x
+-- detachTip x ('EdgeGraph.AdjacencyMap.Internal.edge' x)                 == 'EdgeGraph.AdjacencyMap.Internal.edge' x
 -- detachTip 1 ('into' ('EdgeGraph.AdjacencyMap.Internal.edge' 1) ('EdgeGraph.AdjacencyMap.Internal.edge' 2)) == 'edges' [1, 2]
 -- detachTip 1 ('tips' ('EdgeGraph.AdjacencyMap.Internal.edge' 1) ('EdgeGraph.AdjacencyMap.Internal.edge' 2)) == 'edges' [1, 2]
 -- @
@@ -408,8 +408,8 @@ detachTip a (AdjacencyMap m) = case Map.lookup a m of
 -- @
 -- gmap f 'EdgeGraph.AdjacencyMap.Internal.empty'    == 'EdgeGraph.AdjacencyMap.Internal.empty'
 -- gmap f ('EdgeGraph.AdjacencyMap.Internal.edge' x) == 'EdgeGraph.AdjacencyMap.Internal.edge' (f x)
--- gmap id                                           == id
--- gmap f . gmap g                                   == gmap (f . g)
+-- gmap id         == id
+-- gmap f . gmap g == gmap (f . g)
 -- @
 gmap :: (Ord a, Ord b) => (a -> b) -> AdjacencyMap a -> AdjacencyMap b
 gmap f = fromIncidence . I.gmap f . toIncidence

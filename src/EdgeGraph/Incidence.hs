@@ -48,9 +48,9 @@ import qualified Data.Tree       as Tree
 -- Complexity: /O(n^2 * m)/ time.
 --
 -- @
--- isSubgraphOf 'EdgeGraph.Incidence.empty' x          == True
--- isSubgraphOf ('edge' x) 'EdgeGraph.Incidence.empty' == False
--- isSubgraphOf x ('overlay' x y)                      == True
+-- isSubgraphOf 'EdgeGraph.Incidence.empty' x         == True
+-- isSubgraphOf ('edge' x) 'EdgeGraph.Incidence.empty'  == False
+-- isSubgraphOf x ('overlay' x y) == True
 -- @
 isSubgraphOf :: Ord a => Incidence a -> Incidence a -> Bool
 isSubgraphOf x y = overlay x y == y
@@ -163,9 +163,9 @@ forest = C.forest
 -- Complexity: /O(n * m * log(m))/ time.
 --
 -- @
--- replaceEdge x x            == id
+-- replaceEdge x x          == id
 -- replaceEdge x y ('edge' x) == 'edge' y
--- replaceEdge x y            == 'mergeEdges' (== x) y
+-- replaceEdge x y          == 'mergeEdges' (== x) y
 -- @
 replaceEdge :: Ord a => a -> a -> Incidence a -> Incidence a
 replaceEdge u v = gmap (\w -> if w == u then v else w)
@@ -176,7 +176,7 @@ replaceEdge u v = gmap (\w -> if w == u then v else w)
 --
 -- @
 -- mergeEdges (const False) x == id
--- mergeEdges (== x) y        == 'replaceEdge' x y
+-- mergeEdges (== x)        y == 'replaceEdge' x y
 -- @
 mergeEdges :: Ord a => (a -> Bool) -> a -> Incidence a -> Incidence a
 mergeEdges p v = gmap (\u -> if p u then v else u)
@@ -186,8 +186,8 @@ mergeEdges p v = gmap (\u -> if p u then v else u)
 -- Complexity: /O(n * m)/ time.
 --
 -- @
--- edgeIntSet 'EdgeGraph.Incidence.empty' == 'Data.IntSet.empty'
--- edgeIntSet ('edge' x)                  == 'Data.IntSet.singleton' x
+-- edgeIntSet 'EdgeGraph.Incidence.empty'    == 'Data.IntSet.empty'
+-- edgeIntSet ('edge' x) == 'Data.IntSet.singleton' x
 -- @
 edgeIntSet :: Incidence Int -> IntSet.IntSet
 edgeIntSet = IntSet.fromAscList . edgeList

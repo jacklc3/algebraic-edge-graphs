@@ -49,10 +49,10 @@ the following minimal set of axioms. In equations we use the infix operators
     * 'overlay' is commutative, associative, and idempotent with 'EdgeGraph.Class.empty' as
       the identity:
 
-        >         x +++ y == y +++ x
+        > x +++ y         == y +++ x
         > x +++ (y +++ z) == (x +++ y) +++ z
-        >         x +++ x == x
-        >     x +++ empty == x
+        > x +++ x         == x
+        > x +++ empty     == x
 
     * 'EdgeGraph.Class.empty' is the identity for 'into', 'pits', and 'tips':
 
@@ -105,7 +105,7 @@ The following useful theorems can be proved from the above set of axioms.
     * Absorption and saturation for each connect operator (shown for 'into'):
 
         > x >+> y +++ x +++ y == x >+> y
-        > x >+> x == (x >+> x) >+> x
+        > x >+> x             == (x >+> x) >+> x
 
 When specifying the time and memory complexity of graph algorithms, /n/ will
 denote the number of edges in the graph, /m/ will denote the number of
@@ -249,9 +249,9 @@ tipss = foldr tips empty
 -- a particular graph instance.
 --
 -- @
--- isSubgraphOf 'EdgeGraph.Class.empty'    x       == True
--- isSubgraphOf ('edge' x) 'EdgeGraph.Class.empty' == False
--- isSubgraphOf x          ('overlay' x y)         == True
+-- isSubgraphOf 'EdgeGraph.Class.empty'    x             == True
+-- isSubgraphOf ('edge' x) 'EdgeGraph.Class.empty'         == False
+-- isSubgraphOf x        ('overlay' x y) == True
 -- @
 isSubgraphOf :: (EdgeGraph g, Eq g) => g -> g -> Bool
 isSubgraphOf x y = overlay x y == y
@@ -337,12 +337,12 @@ flower (x : xs) = intos (map edge (x : xs ++ [x]))
 -- lengths of the given lists.
 --
 -- @
--- node []  []    == 'EdgeGraph.Class.empty'
--- node [x] []    == 'edge' x
--- node []  [y]   == 'edge' y
--- node [x] [y]   == 'into' ('edge' x) ('edge' y)
--- node [x] [y,z] == 'into' ('edge' x) ('tips' ('edge' y) ('edge' z))
--- node [x,y] [z] == 'into' ('pits' ('edge' x) ('edge' y)) ('edge' z)
+-- node []    []    == 'EdgeGraph.Class.empty'
+-- node [x]   []    == 'edge' x
+-- node []    [y]   == 'edge' y
+-- node [x]   [y]   == 'into' ('edge' x) ('edge' y)
+-- node [x]   [y,z] == 'into' ('edge' x) ('tips' ('edge' y) ('edge' z))
+-- node [x,y] [z]   == 'into' ('pits' ('edge' x) ('edge' y)) ('edge' z)
 -- @
 node :: EdgeGraph g => [Edge g] -> [Edge g] -> g
 node xs ys = pitss (map edge xs) `into` tipss (map edge ys)

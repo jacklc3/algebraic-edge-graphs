@@ -71,10 +71,10 @@ construction primitives 'EdgeGraph.Fold.empty', 'edge', 'overlay', 'into', 'pits
 
 The 'Show' instance is defined using basic graph construction primitives:
 
-@show ('EdgeGraph.Fold.empty'             :: Fold Int) == "empty"
-show ('edge' 1                           :: Fold Int) == "edge 1"
-show ('overlay' ('edge' 1) ('edge' 2)    :: Fold Int) == "edges [1,2]"
-show ('into' ('edge' 1) ('edge' 2)       :: Fold Int) == "into (edge 1) (edge 2)"@
+@show ('EdgeGraph.Fold.empty'                     :: Fold Int) == "empty"
+show ('edge' 1                    :: Fold Int) == "edge 1"
+show ('overlay' ('edge' 1) ('edge' 2) :: Fold Int) == "edges [1,2]"
+show ('into' ('edge' 1) ('edge' 2)    :: Fold Int) == "into (edge 1) (edge 2)"@
 
 The 'Eq' instance is currently implemented using the 'EdgeGraph.Incidence.Incidence' as the
 /canonical graph representation/ and satisfies all axioms of algebraic edge
@@ -110,10 +110,10 @@ Note that 'size' is slightly different from the 'length' method of the
 'Foldable' type class, as the latter does not count 'EdgeGraph.Fold.empty' leaves of the
 expression:
 
-@'length' 'EdgeGraph.Fold.empty'                              == 0
-'size'   'EdgeGraph.Fold.empty'                              == 1
-'length' ('edge' x)                                          == 1
-'size'   ('edge' x)                                          == 1
+@'length' 'EdgeGraph.Fold.empty'             == 0
+'size'   'EdgeGraph.Fold.empty'             == 1
+'length' ('edge' x)          == 1
+'size'   ('edge' x)          == 1
 'length' ('EdgeGraph.Fold.empty' +++ 'EdgeGraph.Fold.empty') == 0
 'size'   ('EdgeGraph.Fold.empty' +++ 'EdgeGraph.Fold.empty') == 2@
 
@@ -280,10 +280,10 @@ intos = C.intos
 -- @
 -- foldg 'EdgeGraph.Fold.empty' 'edge' 'overlay' 'into' 'pits' 'tips'        == id
 -- foldg 'EdgeGraph.Fold.empty' 'edge' 'overlay' (flip 'into') 'tips' 'pits' == 'transpose'
--- foldg [] return (++) (++) (++) (++)                                       == 'Data.Foldable.toList'
--- foldg 0 (const 1) (+) (+) (+) (+)                                         == 'Data.Foldable.length'
--- foldg 1 (const 1) (+) (+) (+) (+)                                         == 'size'
--- foldg True (const False) (&&) (&&) (&&) (&&)                              == 'isEmpty'
+-- foldg [] return (++) (++) (++) (++)            == 'Data.Foldable.toList'
+-- foldg 0 (const 1) (+) (+) (+) (+)              == 'Data.Foldable.length'
+-- foldg 1 (const 1) (+) (+) (+) (+)              == 'size'
+-- foldg True (const False) (&&) (&&) (&&) (&&)   == 'isEmpty'
 -- @
 foldg :: b -> (a -> b) -> (b -> b -> b) -> (b -> b -> b) -> (b -> b -> b) -> (b -> b -> b) -> Fold a -> b
 foldg e v o i p t g = runFold g e v o i p t
@@ -292,10 +292,10 @@ foldg e v o i p t g = runFold g e v o i p t
 -- Complexity: /O(s)/ time.
 --
 -- @
--- isEmpty 'EdgeGraph.Fold.empty'                                    == True
--- isEmpty ('overlay' 'EdgeGraph.Fold.empty' 'EdgeGraph.Fold.empty') == True
--- isEmpty ('edge' x)                                                == False
--- isEmpty ('removeEdge' x $ 'edge' x)                               == True
+-- isEmpty 'EdgeGraph.Fold.empty'                   == True
+-- isEmpty ('overlay' 'EdgeGraph.Fold.empty' 'EdgeGraph.Fold.empty')   == True
+-- isEmpty ('edge' x)                == False
+-- isEmpty ('removeEdge' x $ 'edge' x) == True
 -- @
 isEmpty :: Fold a -> Bool
 isEmpty = H.isEmpty
@@ -305,11 +305,11 @@ isEmpty = H.isEmpty
 -- Complexity: /O(s)/ time.
 --
 -- @
--- size 'EdgeGraph.Fold.empty' == 1
--- size ('edge' x)             == 1
--- size ('overlay' x y)        == size x + size y
--- size ('into' x y)           == size x + size y
--- size x                      >= 1
+-- size 'EdgeGraph.Fold.empty'         == 1
+-- size ('edge' x)      == 1
+-- size ('overlay' x y) == size x + size y
+-- size ('into' x y)    == size x + size y
+-- size x             >= 1
 -- @
 size :: Fold a -> Int
 size = foldg 1 (const 1) (+) (+) (+) (+)
@@ -318,9 +318,9 @@ size = foldg 1 (const 1) (+) (+) (+) (+)
 -- Complexity: /O(s)/ time.
 --
 -- @
--- hasEdge x 'EdgeGraph.Fold.empty' == False
--- hasEdge x ('edge' x)             == True
--- hasEdge x . 'removeEdge' x       == const False
+-- hasEdge x 'EdgeGraph.Fold.empty'          == False
+-- hasEdge x ('edge' x)       == True
+-- hasEdge x . 'removeEdge' x == const False
 -- @
 hasEdge :: Eq a => a -> Fold a -> Bool
 hasEdge = H.hasEdge
@@ -329,9 +329,9 @@ hasEdge = H.hasEdge
 -- Complexity: /O(s * log(n))/ time.
 --
 -- @
--- edgeCount 'EdgeGraph.Fold.empty' == 0
--- edgeCount ('edge' x)             == 1
--- edgeCount                        == 'length' . 'edgeList'
+-- edgeCount 'EdgeGraph.Fold.empty'    == 0
+-- edgeCount ('edge' x) == 1
+-- edgeCount          == 'length' . 'edgeList'
 -- @
 edgeCount :: Ord a => Fold a -> Int
 edgeCount = I.edgeCount . toIncidence
@@ -340,8 +340,8 @@ edgeCount = I.edgeCount . toIncidence
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeList 'EdgeGraph.Fold.empty' == []
--- edgeList ('edge' x)             == [x]
+-- edgeList 'EdgeGraph.Fold.empty'    == []
+-- edgeList ('edge' x) == [x]
 -- @
 edgeList :: Ord a => Fold a -> [a]
 edgeList = I.edgeList . toIncidence
@@ -350,8 +350,8 @@ edgeList = I.edgeList . toIncidence
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeSet 'EdgeGraph.Fold.empty' == 'Data.Set.empty'
--- edgeSet . 'edge'               == 'Data.Set.singleton'
+-- edgeSet 'EdgeGraph.Fold.empty'  == 'Data.Set.empty'
+-- edgeSet . 'edge' == 'Data.Set.singleton'
 -- @
 edgeSet :: Ord a => Fold a -> Set.Set a
 edgeSet = I.edgeSet . toIncidence
@@ -361,8 +361,8 @@ edgeSet = I.edgeSet . toIncidence
 -- Complexity: /O(s * log(n))/ time and /O(n)/ memory.
 --
 -- @
--- edgeIntSet 'EdgeGraph.Fold.empty' == 'Data.IntSet.empty'
--- edgeIntSet . 'edge'               == 'Data.IntSet.singleton'
+-- edgeIntSet 'EdgeGraph.Fold.empty'  == 'Data.IntSet.empty'
+-- edgeIntSet . 'edge' == 'Data.IntSet.singleton'
 -- @
 edgeIntSet :: Fold Int -> IntSet.IntSet
 edgeIntSet = I.edgeIntSet . toIncidence
@@ -371,8 +371,8 @@ edgeIntSet = I.edgeIntSet . toIncidence
 -- Complexity: /O(s * log(m))/ time.
 --
 -- @
--- nodeCount 'EdgeGraph.Fold.empty' == 0
--- nodeCount ('edge' x)             == 2
+-- nodeCount 'EdgeGraph.Fold.empty'    == 0
+-- nodeCount ('edge' x) == 2
 -- @
 nodeCount :: Ord a => Fold a -> Int
 nodeCount = I.nodeCount . toIncidence
@@ -449,7 +449,7 @@ deBruijn len alphabet = bind skeleton expand
 -- Complexity: /O(s)/ time, memory and size.
 --
 -- @
--- removeEdge x ('edge' x)     == 'EdgeGraph.Fold.empty'
+-- removeEdge x ('edge' x)       == 'EdgeGraph.Fold.empty'
 -- removeEdge x . removeEdge x == removeEdge x
 -- @
 removeEdge :: (Eq (C.Edge g), C.EdgeGraph g) => C.Edge g -> Fold (C.Edge g) -> g
@@ -460,9 +460,9 @@ removeEdge v = induce (/= v)
 -- Complexity: /O(s)/ time, memory and size.
 --
 -- @
--- replaceEdge x x            == id
+-- replaceEdge x x          == id
 -- replaceEdge x y ('edge' x) == 'edge' y
--- replaceEdge x y            == 'mergeEdges' (== x) y
+-- replaceEdge x y          == 'mergeEdges' (== x) y
 -- @
 replaceEdge :: (Eq (C.Edge g), C.EdgeGraph g) => C.Edge g -> C.Edge g -> Fold (C.Edge g) -> g
 replaceEdge u v = gmap $ \w -> if w == u then v else w
@@ -473,7 +473,7 @@ replaceEdge u v = gmap $ \w -> if w == u then v else w
 --
 -- @
 -- mergeEdges (const False) x == id
--- mergeEdges (== x) y        == 'replaceEdge' x y
+-- mergeEdges (== x)        y == 'replaceEdge' x y
 -- @
 mergeEdges :: C.EdgeGraph g => (C.Edge g -> Bool) -> C.Edge g -> Fold (C.Edge g) -> g
 mergeEdges p v = gmap $ \u -> if p u then v else u
@@ -495,9 +495,9 @@ splitEdge v vs g = bind g $ \u -> if u == v then C.edges vs else C.edge u
 -- Complexity: /O(s)/ time, memory and size.
 --
 -- @
--- transpose 'EdgeGraph.Fold.empty' == 'EdgeGraph.Fold.empty'
--- transpose ('edge' x)             == 'edge' x
--- transpose . transpose            == id
+-- transpose 'EdgeGraph.Fold.empty'       == 'EdgeGraph.Fold.empty'
+-- transpose ('edge' x)    == 'edge' x
+-- transpose . transpose == id
 -- @
 transpose :: C.EdgeGraph g => Fold (C.Edge g) -> g
 transpose = foldg C.empty C.edge C.overlay (flip C.into) C.tips C.pits
@@ -506,10 +506,10 @@ transpose = foldg C.empty C.edge C.overlay (flip C.into) C.tips C.pits
 -- This is similar to 'fmap' but can be used with non-fully-parametric graphs.
 --
 -- @
--- gmap f 'EdgeGraph.Fold.empty' == 'EdgeGraph.Fold.empty'
--- gmap f ('edge' x)             == 'edge' (f x)
--- gmap id                       == id
--- gmap f . gmap g               == gmap (f . g)
+-- gmap f 'EdgeGraph.Fold.empty'    == 'EdgeGraph.Fold.empty'
+-- gmap f ('edge' x) == 'edge' (f x)
+-- gmap id         == id
+-- gmap f . gmap g == gmap (f . g)
 -- @
 gmap :: C.EdgeGraph g => (a -> C.Edge g) -> Fold a -> g
 gmap f = foldg C.empty (C.edge . f) C.overlay C.into C.pits C.tips
@@ -520,11 +520,11 @@ gmap f = foldg C.empty (C.edge . f) C.overlay C.into C.pits C.tips
 --
 -- @
 -- bind 'EdgeGraph.Fold.empty' f         == 'EdgeGraph.Fold.empty'
--- bind ('edge' x) f                     == f x
--- bind ('edges' xs) f                   == 'overlays' ('map' f xs)
+-- bind ('edge' x) f      == f x
+-- bind ('edges' xs) f    == 'overlays' ('map' f xs)
 -- bind x (const 'EdgeGraph.Fold.empty') == 'EdgeGraph.Fold.empty'
--- bind x 'edge'                         == x
--- bind (bind x f) g                     == bind x (\\y -> bind (f y) g)
+-- bind x 'edge'          == x
+-- bind (bind x f) g    == bind x (\\y -> bind (f y) g)
 -- @
 bind :: C.EdgeGraph g => Fold a -> (a -> g) -> g
 bind g f = foldg C.empty f C.overlay C.into C.pits C.tips g
@@ -551,10 +551,10 @@ induce p g = bind g $ \v -> if p v then C.edge v else C.empty
 -- that the size of the result does not exceed the size of the given expression.
 --
 -- @
--- simplify x          == x
--- 'size' (simplify x) <= 'size' x
--- simplify 'EdgeGraph.Fold.empty'               ~> 'EdgeGraph.Fold.empty'
--- simplify ('edge' 1)            ~> 'edge' 1
+-- simplify x                 == x
+-- 'size' (simplify x)          <= 'size' x
+-- simplify 'EdgeGraph.Fold.empty'             ~> 'EdgeGraph.Fold.empty'
+-- simplify ('edge' 1)          ~> 'edge' 1
 -- simplify ('edge' 1 + 'edge' 1) ~> 'edge' 1
 -- @
 simplify :: (Eq g, C.EdgeGraph g) => Fold (C.Edge g) -> g
@@ -574,7 +574,7 @@ simple op x y
 --
 -- @
 -- box ('EdgeGraph.Class.path' [0,1]) ('EdgeGraph.Class.path' "ab") == 'edges' [ ((0,\'a\'),(0,\'b\')), ((0,\'a\'),(1,\'a\'))
---                                          , ((0,\'b\'),(1,\'b\')), ((1,\'a\'),(1,\'b\')) ]
+--                                       , ((0,\'b\'),(1,\'b\')), ((1,\'a\'),(1,\'b\')) ]
 -- @
 -- Up to an isomorphism between the resulting edge types, this operation
 -- is /commutative/, /associative/, /distributes/ over 'overlay', has singleton
@@ -582,11 +582,11 @@ simple op x y
 -- stands for the equality up to an isomorphism, e.g. @(x, ()) ~~ x@.
 --
 -- @
--- box x y                      ~~ box y x
--- box x (box y z)              ~~ box (box x y) z
--- box x ('overlay' y z)        == 'overlay' (box x y) (box x z)
--- box x ('edge' ())            ~~ x
--- box x 'EdgeGraph.Fold.empty' ~~ 'EdgeGraph.Fold.empty'
+-- box x y             ~~ box y x
+-- box x (box y z)     ~~ box (box x y) z
+-- box x ('overlay' y z) == 'overlay' (box x y) (box x z)
+-- box x ('edge' ())     ~~ x
+-- box x 'EdgeGraph.Fold.empty'         ~~ 'EdgeGraph.Fold.empty'
 -- @
 box :: (C.EdgeGraph g, C.Edge g ~ (u, v)) => Fold u -> Fold v -> g
 box x y = C.overlays $ xs ++ ys
@@ -606,9 +606,9 @@ data End a = Pit a | Tip a
 -- | Compute shortest paths between edge endpoints using a weight function.
 --
 -- @
--- shortestPaths id    g -- use edge labels as weights
--- shortestPaths (const 1) g -- unit-weight shortest paths (hop count)
 -- shortestPaths id 'EdgeGraph.Fold.empty' == 'Data.Map.Strict.empty'
+-- shortestPaths (const 1) g               -- unit-weight shortest paths (hop count)
+-- shortestPaths id        g               -- use edge labels as weights
 -- @
 shortestPaths :: (Ord a, Num w, Ord w)
               => (a -> w) -> Fold a -> Map.Map (End a, End a) w
@@ -639,7 +639,7 @@ semiringPaths plus times zero weight =
 -- | Compute reachability between edge endpoints.
 --
 -- @
--- reachable 'EdgeGraph.Fold.empty'  == 'Data.Map.Strict.empty'
+-- reachable 'EdgeGraph.Fold.empty' == 'Data.Map.Strict.empty'
 -- @
 reachable :: Ord a => Fold a -> Map.Map (End a, End a) Bool
 reachable = semiringPaths (||) (&&) True (const True)
@@ -656,8 +656,8 @@ isReachable x y g = Map.findWithDefault False (Tip x, Pit y) (reachable g)
 -- | Check if the graph is acyclic.
 --
 -- @
--- isAcyclic 'EdgeGraph.Fold.empty'         == True
--- isAcyclic ('edge' 1)                     == True
+-- isAcyclic 'EdgeGraph.Fold.empty'                    == True
+-- isAcyclic ('edge' 1)                 == True
 -- isAcyclic ('into' ('edge' 1) ('edge' 1)) == False
 -- @
 isAcyclic :: Ord a => Fold a -> Bool

@@ -122,8 +122,8 @@ edgeIntSet = IntSet.fromDistinctAscList . Map.keys . adjacencyMap
 -- i.e. the edges that the given edge flows into.
 --
 -- @
--- postset x 'EdgeGraph.AdjacencyMap.empty'                                               == 'Data.Set.empty'
--- postset x ('EdgeGraph.AdjacencyMap.edge' x)                                            == 'Data.Set.empty'
+-- postset x 'EdgeGraph.AdjacencyMap.empty'                    == 'Data.Set.empty'
+-- postset x ('EdgeGraph.AdjacencyMap.edge' x)                 == 'Data.Set.empty'
 -- postset 1 ('into' ('EdgeGraph.AdjacencyMap.edge' 1) ('EdgeGraph.AdjacencyMap.edge' 2)) == 'Data.Set.singleton' 2
 -- @
 postset :: Ord a => a -> AdjacencyMap a -> Set a
@@ -134,8 +134,8 @@ postset a (AdjacencyMap m) = maybe Set.empty succs (Map.lookup a m)
 -- i.e. the edges that flow into the given edge.
 --
 -- @
--- preset x 'EdgeGraph.AdjacencyMap.empty'                                               == 'Data.Set.empty'
--- preset x ('EdgeGraph.AdjacencyMap.edge' x)                                            == 'Data.Set.empty'
+-- preset x 'EdgeGraph.AdjacencyMap.empty'                    == 'Data.Set.empty'
+-- preset x ('EdgeGraph.AdjacencyMap.edge' x)                 == 'Data.Set.empty'
 -- preset 2 ('into' ('EdgeGraph.AdjacencyMap.edge' 1) ('EdgeGraph.AdjacencyMap.edge' 2)) == 'Data.Set.singleton' 1
 -- @
 preset :: Ord a => a -> AdjacencyMap a -> Set a
@@ -153,10 +153,10 @@ graphKL (AdjacencyMap m) = (g, \u -> case r u of (_, v, _) -> v)
 -- directed flow from each edge to its successors.
 --
 -- @
--- 'dfsForest' 'EdgeGraph.AdjacencyMap.empty'    == []
--- 'dfsForest' ('EdgeGraph.AdjacencyMap.edge' x) == [Node x []]
--- 'isSubgraphOf' ('forest' $ 'dfsForest' x) x   == True
--- 'dfsForest' . 'forest' . 'dfsForest'          == 'dfsForest'
+-- 'dfsForest' 'EdgeGraph.AdjacencyMap.empty'                       == []
+-- 'dfsForest' ('EdgeGraph.AdjacencyMap.edge' x)                    == [Node x []]
+-- 'isSubgraphOf' ('forest' $ 'dfsForest' x) x == True
+-- 'dfsForest' . 'forest' . 'dfsForest'        == 'dfsForest'
 -- @
 dfsForest :: Ord a => AdjacencyMap a -> Forest a
 dfsForest m = let (g, r) = graphKL m in fmap (fmap r) (KL.dff g)
@@ -167,9 +167,9 @@ dfsForest m = let (g, r) = graphKL m in fmap (fmap r) (KL.dff g)
 -- (via 'into'), then @a@ appears before @b@ in the result.
 --
 -- @
--- 'topSort' ('path' [1, 2, 3])                == Just [1, 2, 3]
--- 'topSort' ('circuit' [1, 2])                == Nothing
--- 'topSort' ('EdgeGraph.AdjacencyMap.edge' x) == Just [x]
+-- 'topSort' ('path' [1, 2, 3]) == Just [1, 2, 3]
+-- 'topSort' ('circuit' [1, 2]) == Nothing
+-- 'topSort' ('EdgeGraph.AdjacencyMap.edge' x)         == Just [x]
 -- @
 topSort :: Ord a => AdjacencyMap a -> Maybe [a]
 topSort m = if isTopSort result m then Just result else Nothing
@@ -182,9 +182,9 @@ topSort m = if isTopSort result m then Just result else Nothing
 -- and no edge appears after one of its successors.
 --
 -- @
--- 'isTopSort' [] 'EdgeGraph.AdjacencyMap.empty'     == True
+-- 'isTopSort' []  'EdgeGraph.AdjacencyMap.empty'    == True
 -- 'isTopSort' [x] ('EdgeGraph.AdjacencyMap.edge' x) == True
--- 'isTopSort' [] ('EdgeGraph.AdjacencyMap.edge' x)  == False
+-- 'isTopSort' []  ('EdgeGraph.AdjacencyMap.edge' x) == False
 -- @
 isTopSort :: Ord a => [a] -> AdjacencyMap a -> Bool
 isTopSort xs m = go Set.empty xs
@@ -198,10 +198,10 @@ isTopSort xs m = go Set.empty xs
 -- Edges that form directed cycles are grouped into the same component.
 --
 -- @
--- 'scc' 'EdgeGraph.AdjacencyMap.empty'    == 'EdgeGraph.AdjacencyMap.empty'
--- 'scc' ('EdgeGraph.AdjacencyMap.edge' x) == 'EdgeGraph.AdjacencyMap.edge' ('Data.Set.singleton' x)
--- 'scc' ('circuit' (1:xs))                == 'EdgeGraph.AdjacencyMap.edge' ('Data.Set.fromList' (1:xs))
--- 'edgeCount' ('scc' x) >= 'edgeCount' x  == False
+-- 'scc' 'EdgeGraph.AdjacencyMap.empty'                        == 'EdgeGraph.AdjacencyMap.empty'
+-- 'scc' ('EdgeGraph.AdjacencyMap.edge' x)                     == 'EdgeGraph.AdjacencyMap.edge' ('Data.Set.singleton' x)
+-- 'scc' ('circuit' (1:xs))             == 'EdgeGraph.AdjacencyMap.edge' ('Data.Set.fromList' (1:xs))
+-- 'edgeCount' ('scc' x) >= 'edgeCount' x == False
 -- @
 scc :: Ord a => AdjacencyMap a -> AdjacencyMap (Set a)
 scc m = gmap (\v -> Map.findWithDefault Set.empty v components) m
